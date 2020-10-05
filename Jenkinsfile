@@ -24,7 +24,7 @@ pipeline {
     stage('Build') {
       steps {
         sh '''cd /data/code/resolver
-              docker build --no-cache -t resolver:${env.BUILD_ID} .'''
+              docker build --no-cache -t resolver:${env.BUILD_NUMBER} .'''
       }
     }
 
@@ -38,7 +38,7 @@ pipeline {
         sh '''id
               hostname
               cd /data/code/resolver
-              docker run -it -d -p 9936:80 --name resolver resolver:${env.BUILD_ID}'''
+              docker run -it -d -p 9936:80 --name resolver resolver:${env.BUILD_NUMBER}'''
       }
     }
 
