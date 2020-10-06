@@ -7,6 +7,7 @@ click==7.1.2
 environ==1.0
 flasgger==0.9.5
 Flask==1.1.2
+Flask-REST-JSONAPI==0.31.0
 Flask-SQLAlchemy==2.4.4
 isort==5.5.4
 itsdangerous==1.1.0
@@ -14,12 +15,14 @@ Jinja2==2.11.2
 jsonschema==3.2.0
 lazy-object-proxy==1.4.3
 MarkupSafe==1.1.1
+marshmallow==3.8.0
+marshmallow-jsonapi==0.23.2
 mccabe==0.6.1
 mistune==0.8.4
 mypy-extensions==0.4.3
 pathspec==0.8.0
-psycogreen==1.0.2  # https://github.com/psycopg/psycogreen/
-psycopg2-binary==2.8.4  # https://github.com/psycopg/psycopg2
+psycogreen==1.0.2
+psycopg2-binary==2.8.4
 pycodestyle==2.6.0
 pylint==2.6.0
 pyrsistent==0.17.3
