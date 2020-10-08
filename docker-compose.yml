@@ -1,4 +1,5 @@
-version: "3.8"
+# WARNING: this file is not suitable for production, please use with caution
+version: "3"
 
 services:
   db:
@@ -19,6 +20,19 @@ services:
       DATABASES_PORT: ${SQL_PORT}
       DATABASES_USER: ${SQL_USER}
       PGBOUNCER_LISTEN_PORT: 5432
+  web:
+    image: api
+    build: .
+    command: gunicorn -b 0.0.0.0:5000 api.wsgi:app
+    env_file:
+      - ./.flaskenv
+    environment:
+      - DATABASE_URI=sqlite:////db/api.db
+    volumes:
+      - ./api:/code/api
+      - ./db/:/db/
+    ports:
+      - "5000:5000"
 
 volumes:
   postgres_data:
