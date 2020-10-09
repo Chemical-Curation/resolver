@@ -8,6 +8,7 @@ setup(
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         "flask",
+        "Flask-REST-JSONAPI",
         "flask-sqlalchemy",
         "flask-restful",
         "flask-migrate",
@@ -15,6 +16,7 @@ setup(
         "flask-marshmallow",
         "marshmallow-sqlalchemy",
         "python-dotenv",
+        "psycopg2-binary",
         "passlib",
         "apispec[yaml]",
         "apispec-webframeworks",
