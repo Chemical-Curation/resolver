@@ -8,7 +8,7 @@ from api.extensions import db, jwt, migrate, apispec
 def create_app(testing=False, cli=False):
     """Application factory, used to create application"""
     app = Flask("api")
-    app.config.from_object("api.config")
+    app.config.from_object("api.config.Config")
 
     if testing is True:
         app.config["TESTING"] = True

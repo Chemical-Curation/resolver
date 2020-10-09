@@ -180,12 +180,19 @@ class CompoundSearch(Resource):
                           $ref: '#/components/schemas/CompoundSchema'
     """
 
-    def get(self, search_term):
+    def get(self):
         schema = CompoundSchema(many=True)
         # PostgreSQL cheat sheet:
         # https://medium.com/hackernoon/how-to-query-jsonb-beginner-sheet-cheat-4da3aa5082a3
-        query = Compound.query.filter(
-            Compound.identifiers["preferred_name"].astext.contains(search_term)
-        )
 
-        return paginate(query, schema)
+        if request.args:
+            args = request.args
+            search_term = args["q"]
+            query = Compound.query.filter(
+                Compound.identifiers["preferred_name"].astext.contains(search_term)
+            )
+            return paginate(query, schema)
+        else:
+            return {
+                "msg": "no search string provided",
+            }

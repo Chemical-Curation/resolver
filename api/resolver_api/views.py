@@ -24,9 +24,7 @@ api.add_resource(
 )
 api.add_resource(CompoundList, "/compounds", endpoint="compounds")
 
-api.add_resource(
-    CompoundSearch, "/resolver/<search_term>", endpoint="resolved_compounds"
-)
+api.add_resource(CompoundSearch, "/resolver", endpoint="resolved_compounds")
 
 
 @blueprint.before_app_first_request

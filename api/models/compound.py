@@ -9,6 +9,14 @@ from sqlalchemy.sql import func
 
 
 class Compound(db.Model):
+    """
+    The identifiers field is a JSONB object with keys that may change to meet
+    different user requirements.
+    The JSON keys can be individually queried in PostgreSQL like this:
+    SELECT id, identifiers->>'preferred_name' as preferred_name FROM compounds
+
+    """
+
     __tablename__ = "compounds"
     # The identifiers field needs to be indexed for full-JSON search
     # https://www.postgresql.org/docs/9.5/datatype-json.html#JSON-INDEXING

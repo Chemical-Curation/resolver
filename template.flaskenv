@@ -16,3 +16,4 @@ SQL_USER=postgres
 
 # The server is using 5431 to avoid conflicts with other apps
 DATABASE_URI=postgresql://postgres:postgres@127.0.0.1:5431/resolver
+SQLALCHEMY_TRACK_MODIFICATIONS=False
