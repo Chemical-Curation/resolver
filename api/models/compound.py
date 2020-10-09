@@ -10,6 +10,8 @@ from sqlalchemy.sql import func
 
 class Compound(db.Model):
     """
+    Indexed Compound
+
     The identifiers field is a JSONB object with keys that may change to meet
     different user requirements.
     The JSON keys can be individually queried in PostgreSQL like this:

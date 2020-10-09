@@ -181,7 +181,7 @@ class CompoundSearch(Resource):
                       results:
                         type: array
                         items:
-                          $ref: '#/components/schemas/CompoundSchema'
+                          $ref: '#/components/schemas/CompoundSearchResultSchema'
     """
 
     def get(self):

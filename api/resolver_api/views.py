@@ -9,7 +9,11 @@ from api.resolver_api.resources import (
     CompoundList,
     CompoundSearch,
 )
-from api.resolver_api.schemas import UserSchema, CompoundSchema
+from api.resolver_api.schemas import (
+    UserSchema,
+    CompoundSchema,
+    CompoundSearchResultSchema,
+)
 
 
 blueprint = Blueprint("api", __name__, url_prefix="/api/v1")
@@ -36,6 +40,10 @@ def register_views():
     apispec.spec.components.schema("CompoundSchema", schema=CompoundSchema)
     apispec.spec.path(view=CompoundResource, app=current_app)
     apispec.spec.path(view=CompoundList, app=current_app)
+
+    apispec.spec.components.schema(
+        "CompoundSearchResultSchema", schema=CompoundSearchResultSchema
+    )
 
 
 @blueprint.errorhandler(ValidationError)
