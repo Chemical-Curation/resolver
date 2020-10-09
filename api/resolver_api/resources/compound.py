@@ -6,8 +6,11 @@ from api.extensions import db
 from api.commons.pagination import paginate
 from sqlalchemy.sql.expression import or_
 
+from flask_rest_jsonapi import Api, ResourceDetail, ResourceList
+from flask_rest_jsonapi.exceptions import ObjectNotFound
 
-class CompoundResource(Resource):
+
+class CompoundResource(ResourceDetail):
     """Single object resource
 
     ---
@@ -101,7 +104,7 @@ class CompoundResource(Resource):
         return {"msg": "compound deleted"}
 
 
-class CompoundList(Resource):
+class CompoundList(ResourceList):
     """Creation and get_all
 
     ---
