@@ -156,3 +156,15 @@ class CompoundList(Resource):
         db.session.commit()
 
         return {"msg": "compound created", "compound": schema.dump(compound)}, 201
+
+
+class CompoundSearch(Resource):
+    def get(self, search_term):
+        results = Compound.query.filter(
+            Compound.identifiers.like("%" + search_term + "%")
+        ).all()
+
+        for r in results:
+            print(r.id)
+
+        return schema.dump(results)

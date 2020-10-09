@@ -2,7 +2,13 @@ from flask import Blueprint, current_app, jsonify
 from flask_restful import Api
 from marshmallow import ValidationError
 from api.extensions import apispec
-from api.api.resources import UserResource, UserList, CompoundResource, CompoundList
+from api.api.resources import (
+    UserResource,
+    UserList,
+    CompoundResource,
+    CompoundList,
+    CompoundSearch,
+)
 from api.api.schemas import UserSchema, CompoundSchema
 
 
@@ -18,11 +24,14 @@ api.add_resource(
 )
 api.add_resource(CompoundList, "/compounds", endpoint="compounds")
 
+api.add_resource(
+    CompoundSearch, "/resolver/<search_term>", endpoint="resolved_compounds"
+)
+
 
 @blueprint.before_app_first_request
 def register_views():
     apispec.spec.components.schema("UserSchema", schema=UserSchema)
-
     apispec.spec.path(view=UserResource, app=current_app)
     apispec.spec.path(view=UserList, app=current_app)
 
