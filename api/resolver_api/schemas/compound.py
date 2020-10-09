@@ -11,3 +11,6 @@ class CompoundSchema(ma.SQLAlchemyAutoSchema):
         model = Compound
         sqla_session = db.session
         load_instance = True
+
+# TODO: create a new schema for results. It needs to contain all
+# the scoring metadata

@@ -43,9 +43,3 @@ class Compound(db.Model):
 
         casrn = index_property("identifiers", "casrn", default=None)
         preferred_name = index_property("identifiers", "preferred_name", default=None)
-
-    db.Index(
-        "ix_identifiers",
-        text("(identifiers->'values') jsonb_path_ops"),
-        postgresql_using="gin",
-    )

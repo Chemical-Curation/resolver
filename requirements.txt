@@ -1,3 +1,10 @@
 -e .
 # Wait, what?
 # https://stackoverflow.com/questions/43658870/requirements-txt-vs-setup-py
+
+# The packages you will need in your local dev environment for pytest:
+pytest
+pytest-runner
+pytest-flask
+pytest-factoryboy
+factory_boy
