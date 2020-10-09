@@ -10,6 +10,7 @@ from tests.factories import UserFactory
 
 
 register(UserFactory)
+register(CompoundFactory)
 
 
 @pytest.fixture(scope="session")
