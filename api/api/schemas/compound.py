@@ -4,8 +4,8 @@ from api.extensions import ma, db
 
 class CompoundSchema(ma.SQLAlchemyAutoSchema):
 
-    id = ma.Str(dump_only=True)
-    password = ma.String(load_only=True, required=True)
+    id = ma.Str(required=True)
+    identifiers = ma.Dict(required=True)
 
     class Meta:
         model = Compound

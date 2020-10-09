@@ -159,12 +159,33 @@ class CompoundList(Resource):
 
 
 class CompoundSearch(Resource):
+    """
+
+    ---
+    get:
+      tags:
+        - api
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResult'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CompoundSchema'
+    """
+
     def get(self, search_term):
-        results = Compound.query.filter(
-            Compound.identifiers.like("%" + search_term + "%")
-        ).all()
+        schema = CompoundSchema(many=True)
+        # PostgreSQL cheat sheet:
+        # https://medium.com/hackernoon/how-to-query-jsonb-beginner-sheet-cheat-4da3aa5082a3
+        query = Compound.query.filter(
+            Compound.identifiers["preferred_name"].astext.contains(search_term)
+        )
 
-        for r in results:
-            print(r.id)
-
-        return schema.dump(results)
+        return paginate(query, schema)
