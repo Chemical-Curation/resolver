@@ -4,6 +4,7 @@ from api.resolver_api.schemas import CompoundSchema
 from api.models import Compound
 from api.extensions import db
 from api.commons.pagination import paginate
+from sqlalchemy.sql.expression import or_
 
 
 class CompoundResource(Resource):
@@ -187,9 +188,13 @@ class CompoundSearch(Resource):
 
         if request.args:
             args = request.args
-            search_term = args["q"]
+            search_term = args["identifier"]
             query = Compound.query.filter(
-                Compound.identifiers["preferred_name"].astext.contains(search_term)
+                or_(
+                    Compound.identifiers["preferred_name"].astext.contains(search_term),
+                    Compound.identifiers["casrn"].astext.contains(search_term),
+                    Compound.identifiers["display_name"].astext.contains(search_term),
+                )
             )
             return paginate(query, schema)
         else:
