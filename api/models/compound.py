@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy import text
+from sqlalchemy.sql import func
 
 
 class Compound(db.Model):
@@ -12,16 +13,21 @@ class Compound(db.Model):
     # The identifiers field needs to be indexed for full-JSON search
     # https://www.postgresql.org/docs/9.5/datatype-json.html#JSON-INDEXING
     # https://docs.sqlalchemy.org/en/13/orm/extensions/indexable.html
+
+    id = db.Column(db.String(128), primary_key=True)
+    identifiers = db.Column(JSONB)
     __table_args__ = (
         db.Index(
             "ix_sample",
             text("(identifiers->'values') jsonb_path_ops"),
             postgresql_using="gin",
         ),
+        db.Index(
+            "ix_compounds_tsv",
+            func.to_tsvector("english", identifiers),
+            postgresql_using="gin",
+        ),
     )
-
-    id = db.Column(db.String(128), primary_key=True)
-    identifiers = db.Column(JSONB)
 
     def __init__(self, id, identifiers):
         self.id = id
