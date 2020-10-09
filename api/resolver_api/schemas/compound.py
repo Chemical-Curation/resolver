@@ -17,3 +17,15 @@ class CompoundSchema(Schema):
 
 # TODO: create a new schema for results. It needs to contain all
 # the scoring metadata
+
+
+class CompoundSearchResultSchema(Schema):
+
+    id = ma.Str(required=True)
+    identifiers = ma.Dict(required=True)
+
+    class Meta:
+        type_ = "compound_rearch_results"
+        model = Compound
+        sqla_session = db.session
+        load_instance = True

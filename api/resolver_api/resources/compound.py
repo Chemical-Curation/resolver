@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from api.resolver_api.schemas import CompoundSchema
+from api.resolver_api.schemas import CompoundSchema, CompoundSearchResultSchema
 from api.models import Compound
 from api.extensions import db
 from api.commons.pagination import paginate
@@ -185,7 +185,7 @@ class CompoundSearch(Resource):
     """
 
     def get(self):
-        schema = CompoundSchema(many=True)
+        schema = CompoundSearchResultSchema(many=True)
         # PostgreSQL cheat sheet:
         # https://medium.com/hackernoon/how-to-query-jsonb-beginner-sheet-cheat-4da3aa5082a3
 
