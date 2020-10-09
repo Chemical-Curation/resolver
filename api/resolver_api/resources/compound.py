@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from api.api.schemas import CompoundSchema
+from api.resolver_api.schemas import CompoundSchema
 from api.models import Compound
 from api.extensions import db
 from api.commons.pagination import paginate

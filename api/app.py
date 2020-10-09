@@ -1,7 +1,7 @@
 from flask import Flask
 
 from api import auth
-from api.api import views as api_views
+from api.resolver_api import views as api_views
 from api.extensions import db, jwt, migrate, apispec
 
 

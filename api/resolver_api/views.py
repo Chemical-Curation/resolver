@@ -2,14 +2,14 @@ from flask import Blueprint, current_app, jsonify
 from flask_restful import Api
 from marshmallow import ValidationError
 from api.extensions import apispec
-from api.api.resources import (
+from api.resolver_api.resources import (
     UserResource,
     UserList,
     CompoundResource,
     CompoundList,
     CompoundSearch,
 )
-from api.api.schemas import UserSchema, CompoundSchema
+from api.resolver_api.schemas import UserSchema, CompoundSchema
 
 
 blueprint = Blueprint("api", __name__, url_prefix="/api/v1")

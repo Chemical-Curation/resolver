@@ -7,7 +7,7 @@ Use env var to override
 """
 import os
 
-load_dotenv("./.env")
+load_dotenv("./.flaskenv")
 ENV = os.getenv("FLASK_ENV")
 DEBUG = ENV == "development"
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -17,10 +17,10 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class Config(object):
+
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL",
+        "DATABASE_URI",
     )
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 JWT_BLACKLIST_ENABLED = True
