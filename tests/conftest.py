@@ -1,5 +1,6 @@
 import json
 import pytest
+import psycopg2
 from dotenv import load_dotenv
 
 from api.models import User

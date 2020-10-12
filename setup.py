@@ -17,7 +17,6 @@ setup(
         "marshmallow-sqlalchemy",
         "python-dotenv",
         "psycopg2-binary",
-        "psycopg2",
         "passlib",
         "apispec[yaml]",
         "apispec-webframeworks",
