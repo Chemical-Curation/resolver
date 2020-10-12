@@ -1,17 +1,17 @@
-from api.models import Compound
+from api.models import Substance
 from api.extensions import ma, db
 from marshmallow_jsonapi.flask import Schema
 from marshmallow_jsonapi import fields
 
 
-class CompoundSchema(Schema):
+class SubstanceSchema(Schema):
 
     id = ma.Str(required=True)
     identifiers = ma.Dict(required=True)
 
     class Meta:
-        type_ = "compounds"
-        model = Compound
+        type_ = "substances"
+        model = Substance
         sqla_session = db.session
         load_instance = True
 
@@ -20,7 +20,7 @@ class CompoundSchema(Schema):
 # the scoring metadata
 
 
-class CompoundSearchResultSchema(Schema):
+class SubstanceSearchResultSchema(Schema):
 
     id = ma.Str(required=True)
     identifiers = ma.Dict(required=True)
@@ -32,7 +32,7 @@ class CompoundSearchResultSchema(Schema):
     score = fields.Function(lambda obj: 1)
 
     class Meta:
-        type_ = "compound_rearch_results"
-        model = Compound
+        type_ = "substance_rearch_results"
+        model = Substance
         sqla_session = db.session
         load_instance = True

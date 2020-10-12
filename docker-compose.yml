@@ -7,13 +7,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
-      - ./.env
+      - .flaskenv
     ports:
       - 5431:5432
 
   pgbouncer:
     image: pgbouncer/pgbouncer:1.12.0
     restart: unless-stopped
+    env_file:
+      - .flaskenv
     environment:
       DATABASES_HOST: ${SQL_HOST}
       DATABASES_PASSWORD: ${SQL_PASSWORD}
@@ -25,9 +27,9 @@ services:
     build: .
     command: gunicorn -b 0.0.0.0:5000 api.wsgi:app
     env_file:
-      - ./.flaskenv
+      - .flaskenv
     environment:
-      - DATABASE_URI=sqlite:////db/api.db
+      - DATABASE_URI=${DATABASE_URI}
     volumes:
       - ./api:/code/api
       - ./db/:/db/

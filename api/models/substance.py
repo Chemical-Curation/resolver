@@ -8,18 +8,18 @@ from sqlalchemy import text
 from sqlalchemy.sql import func
 
 
-class Compound(db.Model):
+class Substance(db.Model):
     """
-    Indexed Compound
+    Indexed Substance
 
     The identifiers field is a JSONB object with keys that may change to meet
     different user requirements.
     The JSON keys can be individually queried in PostgreSQL like this:
-    SELECT id, identifiers->>'preferred_name' as preferred_name FROM compounds
+    SELECT id, identifiers->>'preferred_name' as preferred_name FROM substances
 
     """
 
-    __tablename__ = "compounds"
+    __tablename__ = "substances"
     # The identifiers field needs to be indexed for full-JSON search
     # https://www.postgresql.org/docs/9.5/datatype-json.html#JSON-INDEXING
     # https://docs.sqlalchemy.org/en/13/orm/extensions/indexable.html
@@ -33,7 +33,7 @@ class Compound(db.Model):
             postgresql_using="gin",
         ),
         db.Index(
-            "ix_compounds_tsv",
+            "ix_substances_tsv",
             func.to_tsvector("english", identifiers),
             postgresql_using="gin",
         ),

@@ -1,7 +1,7 @@
 from flask import request
 from flask_restful import Resource
-from api.resolver_api.schemas import CompoundSchema, CompoundSearchResultSchema
-from api.models import Compound
+from api.resolver_api.schemas import SubstanceSchema, SubstanceSearchResultSchema
+from api.models import Substance
 from api.extensions import db
 from api.commons.pagination import paginate
 from sqlalchemy.sql.expression import or_
@@ -10,7 +10,7 @@ from flask_rest_jsonapi import Api, ResourceDetail, ResourceList
 from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 
-class CompoundResource(ResourceDetail):
+class SubstanceResource(ResourceDetail):
     """Single object resource
 
     ---
@@ -19,7 +19,7 @@ class CompoundResource(ResourceDetail):
         - api
       parameters:
         - in: path
-          name: compound_id
+          name: substance_id
           schema:
             type: string
       responses:
@@ -29,22 +29,22 @@ class CompoundResource(ResourceDetail):
               schema:
                 type: object
                 properties:
-                  compound: CompoundSchema
+                  substance: SubstanceSchema
         404:
-          description: compound does not exist
+          description: substance does not exist
     put:
       tags:
         - api
       parameters:
         - in: path
-          name: compound_id
+          name: substance_id
           schema:
             type: string
       requestBody:
         content:
           application/json:
             schema:
-              CompoundSchema
+              SubstanceSchema
       responses:
         200:
           content:
@@ -54,16 +54,16 @@ class CompoundResource(ResourceDetail):
                 properties:
                   msg:
                     type: string
-                    example: compound updated
-                  compound: CompoundSchema
+                    example: substance updated
+                  substance: SubstanceSchema
         404:
-          description: compound does not exist
+          description: substance does not exist
     delete:
       tags:
         - api
       parameters:
         - in: path
-          name: compound_id
+          name: substance_id
           schema:
             type: string
       responses:
@@ -75,36 +75,36 @@ class CompoundResource(ResourceDetail):
                 properties:
                   msg:
                     type: string
-                    example: compound deleted
+                    example: substance deleted
         404:
-          description: compound does not exist
+          description: substance does not exist
     """
 
     # method_decorators = [jwt_required]
 
-    def get(self, compound_id):
-        schema = CompoundSchema()
-        compound = Compound.query.get_or_404(compound_id)
-        return {"compound": schema.dump(compound)}
+    def get(self, substance_id):
+        schema = SubstanceSchema()
+        substance = Substance.query.get_or_404(substance_id)
+        return {"substance": schema.dump(substance)}
 
-    def put(self, compound_id):
-        schema = CompoundSchema(partial=True)
-        compound = Compound.query.get_or_404(compound_id)
-        compound = schema.load(request.json, instance=compound)
+    def put(self, substance_id):
+        schema = SubstanceSchema(partial=True)
+        substance = Substance.query.get_or_404(substance_id)
+        substance = schema.load(request.json, instance=substance)
 
         db.session.commit()
 
-        return {"msg": "compound updated", "compound": schema.dump(compound)}
+        return {"msg": "substance updated", "substance": schema.dump(substance)}
 
-    def delete(self, compound_id):
-        compound = Compound.query.get_or_404(compound_id)
-        db.session.delete(compound)
+    def delete(self, substance_id):
+        substance = Substance.query.get_or_404(substance_id)
+        db.session.delete(substance)
         db.session.commit()
 
-        return {"msg": "compound deleted"}
+        return {"msg": "substance deleted"}
 
 
-class CompoundList(ResourceList):
+class SubstanceList(ResourceList):
     """Creation and get_all
 
     ---
@@ -123,7 +123,7 @@ class CompoundList(ResourceList):
                       results:
                         type: array
                         items:
-                          $ref: '#/components/schemas/CompoundSchema'
+                          $ref: '#/components/schemas/SubstanceSchema'
     post:
       tags:
         - api
@@ -131,7 +131,7 @@ class CompoundList(ResourceList):
         content:
           application/json:
             schema:
-              CompoundSchema
+              SubstanceSchema
       responses:
         201:
           content:
@@ -141,28 +141,28 @@ class CompoundList(ResourceList):
                 properties:
                   msg:
                     type: string
-                    example: compound created
-                  compound: CompoundSchema
+                    example: substance created
+                  substance: SubstanceSchema
     """
 
     # method_decorators = [jwt_required]
 
     def get(self):
-        schema = CompoundSchema(many=True)
-        query = Compound.query
+        schema = SubstanceSchema(many=True)
+        query = Substance.query
         return paginate(query, schema)
 
     def post(self):
-        schema = CompoundSchema()
-        compound = schema.load(request.json)
+        schema = SubstanceSchema()
+        substance = schema.load(request.json)
 
-        db.session.add(compound)
+        db.session.add(substance)
         db.session.commit()
 
-        return {"msg": "compound created", "compound": schema.dump(compound)}, 201
+        return {"msg": "substance created", "substance": schema.dump(substance)}, 201
 
 
-class CompoundSearch(Resource):
+class SubstanceSearch(Resource):
     """
 
     ---
@@ -181,22 +181,24 @@ class CompoundSearch(Resource):
                       results:
                         type: array
                         items:
-                          $ref: '#/components/schemas/CompoundSearchResultSchema'
+                          $ref: '#/components/schemas/SubstanceSearchResultSchema'
     """
 
     def get(self):
-        schema = CompoundSearchResultSchema(many=True)
+        schema = SubstanceSearchResultSchema(many=True)
         # PostgreSQL cheat sheet:
         # https://medium.com/hackernoon/how-to-query-jsonb-beginner-sheet-cheat-4da3aa5082a3
 
         if request.args:
             args = request.args
             search_term = args["identifier"]
-            query = Compound.query.filter(
+            query = Substance.query.filter(
                 or_(
-                    Compound.identifiers["preferred_name"].astext.contains(search_term),
-                    Compound.identifiers["casrn"].astext.contains(search_term),
-                    Compound.identifiers["display_name"].astext.contains(search_term),
+                    Substance.identifiers["preferred_name"].astext.contains(
+                        search_term
+                    ),
+                    Substance.identifiers["casrn"].astext.contains(search_term),
+                    Substance.identifiers["display_name"].astext.contains(search_term),
                 )
             )
             return paginate(query, schema)

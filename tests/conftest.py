@@ -6,11 +6,11 @@ from api.models import User
 from api.app import create_app
 from api.extensions import db as _db
 from pytest_factoryboy import register
-from tests.factories import UserFactory, CompoundFactory
+from tests.factories import UserFactory, SubstanceFactory
 
 
 register(UserFactory)
-register(CompoundFactory)
+register(SubstanceFactory)
 
 
 @pytest.fixture(scope="session")

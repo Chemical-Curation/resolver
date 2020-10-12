@@ -5,14 +5,14 @@ from api.extensions import apispec
 from api.resolver_api.resources import (
     UserResource,
     UserList,
-    CompoundResource,
-    CompoundList,
-    CompoundSearch,
+    SubstanceResource,
+    SubstanceList,
+    SubstanceSearch,
 )
 from api.resolver_api.schemas import (
     UserSchema,
-    CompoundSchema,
-    CompoundSearchResultSchema,
+    SubstanceSchema,
+    SubstanceSearchResultSchema,
 )
 
 
@@ -24,11 +24,11 @@ api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user_by_id")
 api.add_resource(UserList, "/users", endpoint="users")
 
 api.add_resource(
-    CompoundResource, "/compounds/<compound_id>", endpoint="compound_by_id"
+    SubstanceResource, "/substances/<substance_id>", endpoint="substance_by_id"
 )
-api.add_resource(CompoundList, "/compounds", endpoint="compounds")
+api.add_resource(SubstanceList, "/substances", endpoint="substances")
 
-api.add_resource(CompoundSearch, "/resolver", endpoint="resolved_compounds")
+api.add_resource(SubstanceSearch, "/resolver", endpoint="resolved_substances")
 
 
 @blueprint.before_app_first_request
@@ -37,12 +37,12 @@ def register_views():
     apispec.spec.path(view=UserResource, app=current_app)
     apispec.spec.path(view=UserList, app=current_app)
 
-    apispec.spec.components.schema("CompoundSchema", schema=CompoundSchema)
-    apispec.spec.path(view=CompoundResource, app=current_app)
-    apispec.spec.path(view=CompoundList, app=current_app)
+    apispec.spec.components.schema("SubstanceSchema", schema=SubstanceSchema)
+    apispec.spec.path(view=SubstanceResource, app=current_app)
+    apispec.spec.path(view=SubstanceList, app=current_app)
 
     apispec.spec.components.schema(
-        "CompoundSearchResultSchema", schema=CompoundSearchResultSchema
+        "SubstanceSearchResultSchema", schema=SubstanceSearchResultSchema
     )
 
 
