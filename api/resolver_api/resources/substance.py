@@ -1,3 +1,4 @@
+import json
 from flask import request
 from flask_restful import Resource
 from api.resolver_api.schemas import SubstanceSchema, SubstanceSearchResultSchema
@@ -6,7 +7,7 @@ from api.extensions import db
 from api.commons.pagination import paginate
 from sqlalchemy.sql.expression import or_
 
-from flask_rest_jsonapi import Api, ResourceDetail, ResourceList
+from flask_rest_jsonapi import ResourceDetail, ResourceList
 from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 
@@ -155,6 +156,14 @@ class SubstanceList(ResourceList):
     def post(self):
         schema = SubstanceSchema()
         substance = schema.load(request.json)
+        identifiers_dict = substance["identifiers"]
+        # substance["identifiers"] = json.dumps(identifiers_dict)
+
+        print("Request JSON serialized into SubstanceSchema:")
+        print("id:")
+        print(substance["id"])
+        print("identifiers:")
+        print(substance["identifiers"])
 
         db.session.add(substance)
         db.session.commit()
