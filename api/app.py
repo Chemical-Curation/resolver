@@ -48,7 +48,6 @@ def configure_apispec(app):
                 "prev": {"type": "string"},
             }
         },
-
     )
 
 
