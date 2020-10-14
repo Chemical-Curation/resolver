@@ -154,21 +154,17 @@ class SubstanceList(ResourceList):
         return paginate(query, schema)
 
     def post(self):
-        schema = SubstanceSchema()
-        substance = schema.load(request.json)
-        identifiers_dict = substance["identifiers"]
-        # substance["identifiers"] = json.dumps(identifiers_dict)
-
-        print("Request JSON serialized into SubstanceSchema:")
-        print("id:")
-        print(substance["id"])
-        print("identifiers:")
-        print(substance["identifiers"])
+        # For now, we are skipping the SubstanceSchema object and
+        # deserializing the request's JSON straight into the ORM
+        substance = Substance(**request.json)
+        # Later we can return to this step and get it working:
+        # schema = SubstanceSchema()
+        # substance = schema.load(request.json)
 
         db.session.add(substance)
         db.session.commit()
 
-        return {"msg": "substance created", "substance": schema.dump(substance)}, 201
+        return {"msg": "substance created", "substance": {}}, 201
 
 
 class SubstanceSearch(Resource):

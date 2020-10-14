@@ -29,7 +29,7 @@ class SubstanceSearchResultSchema(Schema):
     score = fields.Function(lambda obj: 1)
 
     class Meta:
-        type_ = "substance_rearch_results"
+        type_ = "substance_search_results"
         model = Substance
         sqla_session = db.session
         load_instance = True
