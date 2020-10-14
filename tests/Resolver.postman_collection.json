@@ -1,0 +1,232 @@
+{
+	"info": {
+		"_postman_id": "ab9526aa-ab01-4a89-bc5d-3a3b285dcf85",
+		"name": "Resolver",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET Substances",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/substances",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"substances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search for \"Moperone\"",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/resolver?identifier=Moperone",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"resolver"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "Moperone"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Substances, Moperone DTXSID302000003",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.api+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"DTXSID302000003\",\n    \"identifiers\": {\n        \"preferred_name\": \"Moperone\",\n        \"casrn\": \"1050-79-9\",\n        \"inchikey\": \"AGAHNABIDCTLHW-UHFFFAOYSA-N\",\n        \"casalts\": [\n            {\n                \"casalt\": \"0001050799\",\n                \"weight\": 0.5\n            },\n            {\n                \"casalt\": \"1050799\",\n                \"weight\": 0.5\n            }\n        ],\n        \"synonyms\": [\n            {\n                \"synonym\": \"Meperon\",\n                \"weight\": 0.75\n            },\n            {\n                \"synonym\": \"Methylperidol\",\n                \"weight\": 0.5\n            }\n        ]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}substances",
+					"host": [
+						"{{BaseURL}}substances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Substances, Ethanol DTXSID9020584",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"DTXSID9020584\",\n    \"identifiers\": {\n        \"preferred_name\": \"Ethanol\",\n        \"casrn\": \"64-17-5\",\n        \"inchikey\": \"LFQSCWFLJHTTHZ-UHFFFAOYSA-N\",\n        \"casalts\": [\n            {\n                \"casalt\": \"64175\",\n                \"weight\": 0.5\n            },\n            {\n                \"casalt\": \"00064175\",\n                \"weight\": 0.5\n            }\n        ],\n        \"synonyms\": [\n            {\n                \"synonym\": \"Alcohol, Ethyl\",\n                \"weight\": 0.75\n            },\n            {\n                \"synonym\": \"Alcohol\",\n                \"weight\": 0.5\n            }\n        ]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}substances",
+					"host": [
+						"{{BaseURL}}substances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Substances, Hydrogen Peroxide DTXSID302000005",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.api+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"DTXSID302000005\",\n    \"identifiers\": {\n        \"preferred_name\": \"Hydrogen peroxide\",\n        \"casrn\": \"7722-84-1\",\n        \"inchikey\": \"MHAJPDPJQMAIIY-UHFFFAOYSA-N\",\n        \"casalts\": [\n            {\n                \"casalt\": \"0007722841\",\n                \"weight\": 0.5\n            },\n            {\n                \"casalt\": \"7722841\",\n                \"weight\": 0.5\n            }\n        ],\n        \"synonyms\": [\n            {\n                \"synonym\": \"Hydrogen peroxide [USP]\",\n                \"weight\": 0.75\n            },\n            {\n                \"synonym\": \"Wasserstoffperoxid\",\n                \"weight\": 0.5\n            }\n        ]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}substances",
+					"host": [
+						"{{BaseURL}}substances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE DTXSID302000003",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}substances/DTXSID302000003",
+					"host": [
+						"{{BaseURL}}substances"
+					],
+					"path": [
+						"DTXSID302000003"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE DTXSID9020584",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}substances/DTXSID9020584",
+					"host": [
+						"{{BaseURL}}substances"
+					],
+					"path": [
+						"DTXSID9020584"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE DTXSID302000005",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}substances/DTXSID302000005",
+					"host": [
+						"{{BaseURL}}substances"
+					],
+					"path": [
+						"DTXSID302000005"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "bae9fd8a-df58-466c-8eca-e8f6e847af8b",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f3a8a97c-cef9-4bb6-b731-e6d551d046ff",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "f6569ed3-c9aa-48db-a86e-2fa5fe18552a",
+			"key": "BaseURL",
+			"value": "http://localhost:5000/api/v1/"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
