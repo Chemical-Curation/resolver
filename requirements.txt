@@ -2,7 +2,8 @@
 # Wait, what?
 # https://stackoverflow.com/questions/43658870/requirements-txt-vs-setup-py
 
-# The packages you will need in your local dev environment for pytest:
+# The packages you will need in your local dev environment for testing:
+faker
 pytest
 pytest-runner
 pytest-flask
