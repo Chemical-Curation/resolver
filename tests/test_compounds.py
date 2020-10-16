@@ -2,10 +2,10 @@ from flask import url_for
 from api.models import Substance
 
 
-def test_get_substance(client, db, substance, admin_headers):
+def test_get_substance(client, db, substance):
     # test 404
     substance_url = url_for("api.substance_by_id", substance_id="ZTXCID302000003")
-    rep = client.get(substance_url, headers=admin_headers)
+    rep = client.get(substance_url)
     assert rep.status_code == 404
 
     db.session.add(substance)
@@ -13,17 +13,17 @@ def test_get_substance(client, db, substance, admin_headers):
 
     # test get_substance
     substance_url = url_for("api.substance_by_id", substance_id=substance.id)
-    rep = client.get(substance_url, headers=admin_headers)
+    rep = client.get(substance_url)
     assert rep.status_code == 200
 
     data = rep.get_json()["substance"]
     assert data["identifiers"] == substance.identifiers
 
 
-def test_put_substance(client, db, substance, admin_headers):
+def test_put_substance(client, db, substance):
     # test 404
     substance_url = url_for("api.substance_by_id", substance_id="ZTXCID302000003")
-    rep = client.put(substance_url, headers=admin_headers)
+    rep = client.put(substance_url)
     assert rep.status_code == 404
 
     db.session.add(substance)
@@ -33,17 +33,17 @@ def test_put_substance(client, db, substance, admin_headers):
 
     substance_url = url_for("api.substance_by_id", substance_id=substance.id)
     # test update substance
-    rep = client.put(substance_url, json=data, headers=admin_headers)
+    rep = client.put(substance_url, json=data)
     assert rep.status_code == 200
 
     data = rep.get_json()["substance"]
     assert data["identifiers"] == newids
 
 
-def test_delete_substance(client, db, substance, admin_headers):
+def test_delete_substance(client, db, substance):
     # test 404
     substance_url = url_for("api.substance_by_id", substance_id="ZTXCID302000003")
-    rep = client.delete(substance_url, headers=admin_headers)
+    rep = client.delete(substance_url)
     assert rep.status_code == 404
 
     db.session.add(substance)
@@ -52,23 +52,23 @@ def test_delete_substance(client, db, substance, admin_headers):
     # test delete_substance
 
     substance_url = url_for("api.substance_by_id", substance_id=substance.id)
-    rep = client.delete(substance_url, headers=admin_headers)
+    rep = client.delete(substance_url)
     assert rep.status_code == 200
     assert db.session.query(Substance).filter_by(id=substance.id).first() is None
 
 
-def test_create_substance(client, db, admin_headers):
+def test_create_substance(client, db):
     # test bad data
     substances_url = url_for("api.substances")
     data = {"id": ""}
-    rep = client.post(substances_url, json=data, headers=admin_headers)
+    rep = client.post(substances_url, json=data)
     assert rep.status_code == 400
 
     data["id"] = "DTXCID302000999"
     idents = '{ "preferred_name":"Miracle Whip","casrn":"1050-79-9","inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N", "casalts":[{"casalt":"0001050799","weight:0.5},{"casalt":"1050799","weight":0.5}],"synonyms": [{"synonym": "Meperon","weight": 0.75},{"synonym": "Methylperidol","weight": 0.5}]}'
     data["identifiers"] = idents
 
-    rep = client.post(substances_url, json=data, headers=admin_headers)
+    rep = client.post(substances_url, json=data)
     assert rep.status_code == 201
 
     data = rep.get_json()
@@ -82,14 +82,14 @@ def test_create_substance(client, db, admin_headers):
     assert substance.preferred_name in data
 
 
-def test_get_all_substances(client, db, substance_factory, admin_headers):
+def test_get_all_substances(client, db, substance_factory):
     substances_url = url_for("api.substances")
     substances = substance_factory.create_batch(30)
 
     db.session.add_all(substances)
     db.session.commit()
 
-    rep = client.get(substances_url, headers=admin_headers)
+    rep = client.get(substances_url)
     assert rep.status_code == 200
 
     results = rep.get_json()
