@@ -154,9 +154,11 @@ class SubstanceList(ResourceList):
         return paginate(query, schema)
 
     def post(self):
+        """This post needs to handle both updates and creates."""
+
         # For now, we are skipping the SubstanceSchema object and
         # deserializing the request's JSON straight into the ORM
-        substance = Substance(**request.json)
+        substance = Substance.query.get(request.json.get("id")) or Substance(**request.json)
         # Later we can return to this step and get it working:
         # schema = SubstanceSchema()
         # substance = schema.load(request.json)
