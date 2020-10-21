@@ -1,19 +1,19 @@
 from api.models import Substance
 from api.extensions import ma, db
-from marshmallow_jsonapi.flask import Schema
+from marshmallow_jsonapi.schema import Schema
 from marshmallow_jsonapi import fields
 from marshmallow_sqlalchemy import auto_field
 
 
-class SubstanceSchema(ma.SQLAlchemySchema):
+class SubstanceSchema(Schema):
     id = fields.Str()
     identifiers = fields.Dict()  # Swagger does not render this if it's Raw
 
     class Meta:
         model = Substance
-        type_ = "substances"
+        type_ = "substance"
         self_view = "substance_detail"
-        self_view_kwargs = {"substance_detail": "<id>"}
+        self_view_kwargs = {"id": "<id>"}
         self_view_many = "substance_list"
 
 

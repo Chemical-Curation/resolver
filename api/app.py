@@ -8,7 +8,7 @@ from api.extensions import db, jwt, migrate, apispec
 def create_app(testing=False, cli=False):
     """Application factory, used to create application"""
     app = Flask("api")
-    app.config.from_object("api.config.Config")
+    app.config.from_object("api.config")
     # this is the only place I was able to reliably set this variable
     # and avoid getting nagged about it
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -54,4 +54,5 @@ def configure_apispec(app):
 def register_blueprints(app):
     """register all blueprints for application"""
     app.register_blueprint(auth.views.blueprint)
-    app.register_blueprint(api_views.blueprint)
+    api_views.make_api(app)
+    # app.register_blueprint(api_views.blueprint)

@@ -4,7 +4,7 @@ from api.models import Substance
 
 def test_get_substance(client, db, substance):
     # test 404
-    substance_url = url_for("api.substance_by_id", substance_id="ZTXCID302000003")
+    substance_url = url_for("substance_detail", id="ZTXCID302000003")
     rep = client.get(substance_url)
     assert rep.status_code == 404
 
@@ -12,7 +12,7 @@ def test_get_substance(client, db, substance):
     db.session.commit()
 
     # test get_substance
-    substance_url = url_for("api.substance_by_id", substance_id=substance.id)
+    substance_url = url_for("substance_detail", id=substance.id)
     rep = client.get(substance_url)
     assert rep.status_code == 200
 
@@ -22,7 +22,7 @@ def test_get_substance(client, db, substance):
 
 def test_put_substance(client, db, substance):
     # test 404
-    substance_url = url_for("api.substance_by_id", substance_id="ZTXCID302000003")
+    substance_url = url_for("substance_detail", id="ZTXCID302000003")
     rep = client.put(substance_url)
     assert rep.status_code == 404
 
@@ -31,7 +31,7 @@ def test_put_substance(client, db, substance):
     newids = '{ "preferred_name":"Moperone Updated","casrn":"1050-79-9","inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N", "casalts":[{"casalt":"0001050799","weight:0.5},{"casalt":"1050799","weight":0.5}],"synonyms": [{"synonym": "Meperon","weight": 0.75},{"synonym": "Methylperidol","weight": 0.5}]}'
     data = {"identifiers": newids}
 
-    substance_url = url_for("api.substance_by_id", substance_id=substance.id)
+    substance_url = url_for("substance_detail", id=substance.id)
     # test update substance
     rep = client.put(substance_url, json=data)
     assert rep.status_code == 200
@@ -42,7 +42,8 @@ def test_put_substance(client, db, substance):
 
 def test_delete_substance(client, db, substance):
     # test 404
-    substance_url = url_for("api.substance_by_id", substance_id="ZTXCID302000003")
+    substance_url = url_for("substance_detail", id="ZTXCID302000003")
+    print(substance_url)
     rep = client.delete(substance_url)
     assert rep.status_code == 404
 
@@ -51,7 +52,7 @@ def test_delete_substance(client, db, substance):
 
     # test delete_substance
 
-    substance_url = url_for("api.substance_by_id", substance_id=substance.id)
+    substance_url = url_for("substance_detail", id=substance.id)
     rep = client.delete(substance_url)
     assert rep.status_code == 200
     assert db.session.query(Substance).filter_by(id=substance.id).first() is None
@@ -59,9 +60,10 @@ def test_delete_substance(client, db, substance):
 
 def test_create_substance(client, db):
     # test bad data
-    substances_url = url_for("api.substances")
-    data = {"id": ""}
-    rep = client.post(substances_url, json=data)
+    substances_url = url_for("substance_list")
+    data = {'data': {"id": "", "type": "substances", "attributes": {'identifiers': {}}}}
+    rep = client.post(substances_url, json=data, headers={"content-type": "application/vnd.api+json"})
+    print(rep.get_json())
     assert rep.status_code == 400
 
     data["id"] = "DTXCID302000999"
@@ -83,7 +85,7 @@ def test_create_substance(client, db):
 
 
 def test_get_all_substances(client, db, substance_factory):
-    substances_url = url_for("api.substances")
+    substances_url = url_for("substance_list")
     substances = substance_factory.create_batch(30)
 
     db.session.add_all(substances)

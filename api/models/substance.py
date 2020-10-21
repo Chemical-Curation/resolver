@@ -39,9 +39,9 @@ class Substance(db.Model):
         ),
     )
 
-    def __init__(self, id, identifiers):
-        self.id = id
-        self.identifiers = identifiers
-
-        casrn = index_property("identifiers", "casrn", default=None)
-        preferred_name = index_property("identifiers", "preferred_name", default=None)
+    # def __init__(self, id, identifiers):
+    #     self.id = id
+    #     self.identifiers = identifiers
+    #
+    #     casrn = index_property("identifiers", "casrn", default=None)
+    #     preferred_name = index_property("identifiers", "preferred_name", default=None)

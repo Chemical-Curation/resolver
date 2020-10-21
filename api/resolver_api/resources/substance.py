@@ -81,28 +81,31 @@ class SubstanceResource(ResourceDetail):
           description: substance does not exist
     """
 
+    schema = SubstanceSchema
+    data_layer = {'session': db.session,
+                  'model': Substance}
     # method_decorators = [jwt_required]
 
-    def get(self, substance_id):
-        schema = SubstanceSchema()
-        substance = Substance.query.get_or_404(substance_id)
-        return {"substance": schema.dump(substance)}
-
-    def put(self, substance_id):
-        schema = SubstanceSchema(partial=True)
-        substance = Substance.query.get_or_404(substance_id)
-        substance = schema.load(request.json, instance=substance)
-
-        db.session.commit()
-
-        return {"msg": "substance updated", "substance": schema.dump(substance)}
-
-    def delete(self, substance_id):
-        substance = Substance.query.get_or_404(substance_id)
-        db.session.delete(substance)
-        db.session.commit()
-
-        return {"msg": "substance deleted"}
+    # def get(self, substance_id):
+    #     schema = SubstanceSchema()
+    #     substance = Substance.query.get_or_404(substance_id)
+    #     return {"substance": schema.dump(substance)}
+    #
+    # def put(self, substance_id):
+    #     schema = SubstanceSchema(partial=True)
+    #     substance = Substance.query.get_or_404(substance_id)
+    #     substance = schema.load(request.json, instance=substance)
+    #
+    #     db.session.commit()
+    #
+    #     return {"msg": "substance updated", "substance": schema.dump(substance)}
+    #
+    # def delete(self, substance_id):
+    #     substance = Substance.query.get_or_404(substance_id)
+    #     db.session.delete(substance)
+    #     db.session.commit()
+    #
+    #     return {"msg": "substance deleted"}
 
 
 class SubstanceList(ResourceList):
@@ -147,24 +150,14 @@ class SubstanceList(ResourceList):
     """
 
     # method_decorators = [jwt_required]
+    schema = SubstanceSchema
+    data_layer = {'session': db.session,
+                  'model': Substance}
 
-    def get(self):
-        schema = SubstanceSchema(many=True)
-        query = Substance.query
-        return paginate(query, schema)
-
-    def post(self):
-        # For now, we are skipping the SubstanceSchema object and
-        # deserializing the request's JSON straight into the ORM
-        substance = Substance(**request.json)
-        # Later we can return to this step and get it working:
-        # schema = SubstanceSchema()
-        # substance = schema.load(request.json)
-
-        db.session.add(substance)
-        db.session.commit()
-
-        return {"msg": "substance created", "substance": {}}, 201
+    # def get(self):
+    #     schema = SubstanceSchema(many=True)
+    #     query = Substance.query
+    #     return paginate(query, schema)
 
 
 class SubstanceSearch(Resource):

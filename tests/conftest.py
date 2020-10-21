@@ -16,7 +16,7 @@ register(SubstanceFactory)
 
 @pytest.fixture(scope="session")
 def app():
-    load_dotenv("../.testenv")
+    load_dotenv(".testenv")
     app = create_app(testing=True)
     return app
 
@@ -50,12 +50,12 @@ def admin_headers(admin_user, client):
     rep = client.post(
         "/auth/login",
         data=json.dumps(data),
-        headers={"content-type": "application/json"},
+        headers={"content-type": "application/vnd.api+json"},
     )
 
     tokens = json.loads(rep.get_data(as_text=True))
     return {
-        "content-type": "application/json",
+        "content-type": "application/vnd.api+json",
         "authorization": "Bearer %s" % tokens["access_token"],
     }
 
@@ -66,11 +66,11 @@ def admin_refresh_headers(admin_user, client):
     rep = client.post(
         "/auth/login",
         data=json.dumps(data),
-        headers={"content-type": "application/json"},
+        headers={"content-type": "application/vnd.api+json"},
     )
 
     tokens = json.loads(rep.get_data(as_text=True))
     return {
-        "content-type": "application/json",
+        "content-type": "application/vnd.api+json",
         "authorization": "Bearer %s" % tokens["refresh_token"],
     }
