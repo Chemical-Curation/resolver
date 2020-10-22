@@ -25,7 +25,7 @@ class Substance(db.Model):
     # https://docs.sqlalchemy.org/en/13/orm/extensions/indexable.html
 
     id = db.Column(db.String(128), primary_key=True)
-    identifiers = db.Column(JSONB)
+    identifiers = db.Column(JSONB, nullable=False)
     __table_args__ = (
         db.Index(
             "ix_sample",
@@ -39,9 +39,5 @@ class Substance(db.Model):
         ),
     )
 
-    # def __init__(self, id, identifiers):
-    #     self.id = id
-    #     self.identifiers = identifiers
-    #
-    #     casrn = index_property("identifiers", "casrn", default=None)
-    #     preferred_name = index_property("identifiers", "preferred_name", default=None)
+    casrn = index_property("identifiers", "casrn", default=None)
+    preferred_name = index_property("identifiers", "preferred_name", default=None)

@@ -54,5 +54,5 @@ def configure_apispec(app):
 def register_blueprints(app):
     """register all blueprints for application"""
     app.register_blueprint(auth.views.blueprint)
-    api_views.make_api(app)
-    # app.register_blueprint(api_views.blueprint)
+    app.register_blueprint(api_views.blueprint)
+    api_views.make_jsonapi(app)
