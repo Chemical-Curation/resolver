@@ -15,12 +15,11 @@ def create_app(testing=False, cli=False):
 
     if testing is True:
         app.config["TESTING"] = True
+        init_db()
 
     configure_extensions(app, cli)
     configure_apispec(app)
     register_blueprints(app)
-
-    init_db()
 
     return app
 

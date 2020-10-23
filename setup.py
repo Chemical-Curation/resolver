@@ -14,6 +14,7 @@ setup(
         "flask-migrate",
         "flask-jwt-extended",
         "flask-marshmallow",
+        "gunicorn",
         "marshmallow-sqlalchemy",
         "python-dotenv",
         "psycopg2-binary",

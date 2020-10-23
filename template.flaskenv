@@ -1,5 +1,5 @@
 FLASK_ENV=development
-FLASK_APP=api.app:create_app
+FLASK_APP=resolver.app:create_app
 SECRET_KEY=changeme
 
 # The POSTGRES_* variables are required by the docker-compose file
