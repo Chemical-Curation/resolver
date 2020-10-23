@@ -2,15 +2,15 @@ from flask import Blueprint, current_app, jsonify
 from flask_rest_jsonapi import Api as JsonApi
 from flask_restful import Api as RestfulApi
 from marshmallow import ValidationError
-from api.extensions import apispec
-from api.resolver_api.resources import (
+from resolver.extensions import apispec
+from resolver.api.resources import (
     UserResource,
     UserList,
     SubstanceResource,
     SubstanceList,
     SubstanceSearch,
 )
-from api.resolver_api.schemas import (
+from resolver.api.schemas import (
     UserSchema,
     SubstanceSchema,
     SubstanceSearchResultSchema,

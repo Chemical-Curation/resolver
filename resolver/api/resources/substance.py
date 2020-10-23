@@ -1,10 +1,10 @@
 import json
 from flask import request
 from flask_restful import Resource
-from api.resolver_api.schemas import SubstanceSchema, SubstanceSearchResultSchema
-from api.models import Substance
-from api.extensions import db
-from api.commons.pagination import paginate
+from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
+from resolver.models import Substance
+from resolver.extensions import db
+from resolver.commons.pagination import paginate
 from sqlalchemy.sql.expression import or_
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList

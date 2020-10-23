@@ -1,6 +1,6 @@
 default_context:
   project_name: "Resolver"
-  app_name: "api"
+  app_name: "resolver"
   python_version: "3.8"
   admin_user_username: "postgres"
   admin_user_email: "admin@mail.com"

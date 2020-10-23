@@ -1,5 +1,5 @@
 from flask import url_for
-from api.models import Substance
+from resolver.models import Substance
 
 
 def test_get_substance(client, db, substance):

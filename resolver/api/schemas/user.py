@@ -1,5 +1,5 @@
-from api.models import User
-from api.extensions import ma, db
+from resolver.models import User
+from resolver.extensions import ma, db
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):

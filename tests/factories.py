@@ -1,5 +1,5 @@
 import factory
-from api.models import User, Substance
+from resolver.models import User, Substance
 
 
 class UserFactory(factory.Factory):

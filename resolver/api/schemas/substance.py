@@ -1,8 +1,7 @@
-from api.models import Substance
-from api.extensions import ma, db
+from resolver.models import Substance
+from resolver.extensions import db
 from marshmallow_jsonapi.schema import Schema
 from marshmallow_jsonapi import fields
-from marshmallow_sqlalchemy import auto_field
 
 
 class SubstanceSchema(Schema):

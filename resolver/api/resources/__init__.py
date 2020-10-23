@@ -1,5 +1,5 @@
-from api.resolver_api.resources.user import UserResource, UserList
-from api.resolver_api.resources.substance import (
+from resolver.api.resources.user import UserResource, UserList
+from resolver.api.resources.substance import (
     SubstanceResource,
     SubstanceList,
     SubstanceSearch,

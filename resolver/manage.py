@@ -1,7 +1,8 @@
 import click
 from flask.cli import FlaskGroup
 
-from api.app import create_app
+from resolver.app import create_app
+from resolver.extensions import init_db
 
 
 def create_api(info):
@@ -13,11 +14,17 @@ def cli():
     """Main entry point"""
 
 
+@cli.command("initdb")
+def initdb():
+    init_db()
+    print("Database Created")
+
+
 @cli.command("init")
 def init():
     """Create a new admin user"""
-    from api.extensions import db
-    from api.models import User
+    from resolver.extensions import db
+    from resolver.models import User
 
     click.echo("create user")
     user = User(
@@ -34,8 +41,8 @@ if __name__ == "__main__":
 
 @cli.command("load_seed_data")
 def load_seed_data():
-    from api.models import Substance
-    from api.extensions import db
+    from resolver.models import Substance
+    from resolver.extensions import db
 
     """Add sample records to the Substance model"""
     # https://chem.nlm.nih.gov/chemidplus/rn/1050-79-9

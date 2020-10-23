@@ -3,9 +3,9 @@ import pytest
 import psycopg2
 from dotenv import load_dotenv
 
-from api.models import User
-from api.app import create_app
-from api.extensions import db as _db
+from resolver.models import User
+from resolver.app import create_app
+from resolver.extensions import db as _db
 from pytest_factoryboy import register
 from tests.factories import UserFactory, SubstanceFactory
 

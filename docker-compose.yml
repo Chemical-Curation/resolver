@@ -17,21 +17,22 @@ services:
     env_file:
       - .flaskenv
     environment:
-      DATABASES_HOST: ${SQL_HOST}
-      DATABASES_PASSWORD: ${SQL_PASSWORD}
-      DATABASES_PORT: ${SQL_PORT}
-      DATABASES_USER: ${SQL_USER}
+      DATABASES_HOST: ${SQL_HOST:-}
+      DATABASES_PASSWORD: ${SQL_PASSWORD:-}
+      DATABASES_PORT: ${SQL_PORT:-}
+      DATABASES_USER: ${SQL_USER:-}
       PGBOUNCER_LISTEN_PORT: 5432
+
   web:
-    image: api
+    image: resolver
     build: .
-    command: gunicorn -b 0.0.0.0:5000 api.wsgi:app
+    command: gunicorn -b 0.0.0.0:5000 resolver.wsgi:app
     env_file:
       - .flaskenv
     environment:
-      - DATABASE_URI=${DATABASE_URI}
+      - DATABASE_URI=${DATABASE_URI:-}
     volumes:
-      - ./api:/code/api
+      - ./resolver:/code/resolver
       - ./db/:/db/
     ports:
       - "5000:5000"

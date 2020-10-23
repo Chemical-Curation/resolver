@@ -1,4 +1,4 @@
-from api.extensions import db, pwd_context
+from resolver.extensions import db, pwd_context
 
 from flask import jsonify
 from sqlalchemy.dialects.postgresql import JSONB
