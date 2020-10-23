@@ -1,4 +1,3 @@
-import json
 from flask import request
 from flask_restful import Resource
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
@@ -8,7 +7,6 @@ from resolver.commons.pagination import paginate
 from sqlalchemy.sql.expression import or_
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList
-from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 
 class SubstanceResource(ResourceDetail):
@@ -82,8 +80,7 @@ class SubstanceResource(ResourceDetail):
     """
 
     schema = SubstanceSchema
-    data_layer = {'session': db.session,
-                  'model': Substance}
+    data_layer = {"session": db.session, "model": Substance}
 
 
 class SubstanceList(ResourceList):
@@ -128,8 +125,7 @@ class SubstanceList(ResourceList):
     """
 
     schema = SubstanceSchema
-    data_layer = {'session': db.session,
-                  'model': Substance}
+    data_layer = {"session": db.session, "model": Substance}
 
 
 class SubstanceSearch(Resource):

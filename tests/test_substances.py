@@ -24,21 +24,41 @@ def test_get_substance(client, db, substance):
 def test_patch_substance(client, db, substance):
     # test 404
     substance_url = url_for("substance_detail", id="ZTXCID302000003")
-    data = {"data": {"id": "ZTXCID302000003", "type": "substance", "attributes": {"identifiers": {}}}}
-    rep = client.patch(substance_url, json=data, headers={"content-type": "application/vnd.api+json"})
+    data = {
+        "data": {
+            "id": "ZTXCID302000003",
+            "type": "substance",
+            "attributes": {"identifiers": {}},
+        }
+    }
+    rep = client.patch(
+        substance_url, json=data, headers={"content-type": "application/vnd.api+json"}
+    )
     assert rep.status_code == 404
 
     db.session.add(substance)
     db.session.commit()
-    new_idents = {"preferred_name": "Moperone Updated", "casrn": "1050-79-9", "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
-              "casalts": [{"casalt": "0001050799", "weight": 0.5}, {"casalt": "1050799", "weight": 0.5}],
-              "synonyms": [{"synonym": "Meperon", "weight": 0.75}, {"synonym": "Methylperidol", "weight": 0.5}]}
+    new_idents = {
+        "preferred_name": "Moperone Updated",
+        "casrn": "1050-79-9",
+        "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
+        "casalts": [
+            {"casalt": "0001050799", "weight": 0.5},
+            {"casalt": "1050799", "weight": 0.5},
+        ],
+        "synonyms": [
+            {"synonym": "Meperon", "weight": 0.75},
+            {"synonym": "Methylperidol", "weight": 0.5},
+        ],
+    }
     data["data"]["id"] = substance.id
     data["data"]["attributes"]["identifiers"] = new_idents
 
     substance_url = url_for("substance_detail", id=substance.id)
     # test update substance
-    rep = client.patch(substance_url, json=data, headers={"content-type": "application/vnd.api+json"})
+    rep = client.patch(
+        substance_url, json=data, headers={"content-type": "application/vnd.api+json"}
+    )
     assert rep.status_code == 200
     print(rep.get_json())
     substance_idents = rep.get_json()["data"]["attributes"]["identifiers"]
@@ -66,22 +86,36 @@ def test_delete_substance(client, db, substance):
 def test_create_substance(client, db):
     # test bad data
     substances_url = url_for("substance_list")
-    data = {'data': {"id": "", "type": "substance", "attributes": {}}}
-    rep = client.post(substances_url, json=data, headers={"content-type": "application/vnd.api+json"})
+    data = {"data": {"id": "", "type": "substance", "attributes": {}}}
+    rep = client.post(
+        substances_url, json=data, headers={"content-type": "application/vnd.api+json"}
+    )
     assert rep.status_code == 500
 
     data["data"]["id"] = "DTXCID302000999"
-    idents = {"preferred_name":"Miracle Whip","casrn":"1050-79-9","inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N", "casalts":[{"casalt":"0001050799","weight":0.5},{"casalt":"1050799","weight":0.5}],"synonyms": [{"synonym": "Meperon","weight": 0.75},{"synonym": "Methylperidol","weight": 0.5}]}
+    idents = {
+        "preferred_name": "Miracle Whip",
+        "casrn": "1050-79-9",
+        "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
+        "casalts": [
+            {"casalt": "0001050799", "weight": 0.5},
+            {"casalt": "1050799", "weight": 0.5},
+        ],
+        "synonyms": [
+            {"synonym": "Meperon", "weight": 0.75},
+            {"synonym": "Methylperidol", "weight": 0.5},
+        ],
+    }
     data["data"]["attributes"]["identifiers"] = idents
 
-    rep = client.post(substances_url, json=data, headers={"content-type": "application/vnd.api+json"})
+    rep = client.post(
+        substances_url, json=data, headers={"content-type": "application/vnd.api+json"}
+    )
     assert rep.status_code == 201
 
     data = rep.get_json()
     rep_ident_values = data["data"]["attributes"]["identifiers"].values()
-    substance = (
-        db.session.query(Substance).filter_by(id=data['data']["id"]).first()
-    )
+    substance = db.session.query(Substance).filter_by(id=data["data"]["id"]).first()
 
     assert substance.identifiers == idents
     # test those index_properties

@@ -48,12 +48,18 @@ def load_seed_data():
     # https://chem.nlm.nih.gov/chemidplus/rn/1050-79-9
     s1 = Substance(
         id="DTXCID302000003",
-        identifiers="{ 'preferred_name':'Moperone','casrn':'1050-79-9','inchikey': 'AGAHNABIDCTLHW-UHFFFAOYSA-N', 'casalts':[{'casalt':'0001050799','weight':0.5},{'casalt':'1050799','weight':0.5}],'synonyms': [{'synonym': 'Meperon','weight': 0.75},{'synonym': 'Methylperidol','weight': 0.5}]}",
+        identifiers="{'preferred_name':'Moperone','casrn':'1050-79-9','inchikey': 'AGAHNABIDCTLHW-UHFFFAOYSA-N', "
+        "'casalts':[{'casalt':'0001050799','weight':0.5},{'casalt':'1050799','weight':0.5}],"
+        "'synonyms': [{'synonym': 'Meperon','weight': 0.75},{'synonym': 'Methylperidol','weight': 0.5}]}",
     )
     db.session.add(s1)
     s2 = Substance(
         id="DTXCID302000004",
-        identifiers="{ 'preferred_name':'Hydrogen peroxide','casrn':'7722-84-1','inchikey': 'MHAJPDPJQMAIIY-UHFFFAOYSA-N', 'casalts':[{'casalt':'0007722841','weight':0.5},{'casalt':'7722841','weight':0.5}],'synonyms': [{'synonym': 'Hydrogen peroxide [USP]','weight': 0.75},{'synonym': 'Wasserstoffperoxid','weight': 0.5}]}",
+        identifiers="{'preferred_name':'Hydrogen peroxide','casrn':'7722-84-1',"
+        "'inchikey': 'MHAJPDPJQMAIIY-UHFFFAOYSA-N', "
+        "'casalts':[{'casalt':'0007722841','weight':0.5},{'casalt':'7722841','weight':0.5}],"
+        "'synonyms': [{'synonym': 'Hydrogen peroxide [USP]','weight': 0.75},"
+        "{'synonym': 'Wasserstoffperoxid','weight': 0.5}]}",
     )
 
     db.session.add(s2)

@@ -1,11 +1,9 @@
 import os
-from dotenv import load_dotenv
 
 """Default configuration
 
 Use env var to override
 """
-import os
 
 ENV = os.getenv("FLASK_ENV")
 DEBUG = ENV == "development"

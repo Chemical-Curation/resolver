@@ -1,8 +1,6 @@
-from resolver.extensions import db, pwd_context
+from resolver.extensions import db
 
-from flask import jsonify
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy import text
 from sqlalchemy.sql import func

@@ -10,11 +10,7 @@ from resolver.api.resources import (
     SubstanceList,
     SubstanceSearch,
 )
-from resolver.api.schemas import (
-    UserSchema,
-    SubstanceSchema,
-    SubstanceSearchResultSchema,
-)
+from resolver.api.schemas import UserSchema
 
 api_versioning_v1 = "/api/v1"
 
@@ -29,10 +25,14 @@ restful_api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user_de
 def make_jsonapi(app):
     jsonapi = JsonApi(app=app)
     jsonapi.route(SubstanceList, "substance_list", f"{api_versioning_v1}/substances")
-    jsonapi.route(SubstanceResource, "substance_detail", f"{api_versioning_v1}/substances/<id>")
+    jsonapi.route(
+        SubstanceResource, "substance_detail", f"{api_versioning_v1}/substances/<id>"
+    )
 
     #  is this jsonapi?  If not this should be treated differently
-    jsonapi.route(SubstanceSearch, "resolved_substances", f"{api_versioning_v1}/resolver")
+    jsonapi.route(
+        SubstanceSearch, "resolved_substances", f"{api_versioning_v1}/resolver"
+    )
 
 
 @blueprint.before_app_first_request
