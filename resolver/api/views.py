@@ -10,7 +10,7 @@ from resolver.api.resources import (
     SubstanceList,
     SubstanceSearch,
 )
-from resolver.api.schemas import UserSchema
+from resolver.api.schemas import UserSchema, SubstanceSearchResultSchema
 
 api_versioning_v1 = "/api/v1"
 
@@ -20,6 +20,7 @@ restful_api = RestfulApi(blueprint)
 
 restful_api.add_resource(UserList, "/users", endpoint="user_list")
 restful_api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user_detail")
+restful_api.add_resource(SubstanceSearch, "/resolver", endpoint="resolved_substances")
 
 
 def make_jsonapi(app):
@@ -29,17 +30,14 @@ def make_jsonapi(app):
         SubstanceResource, "substance_detail", f"{api_versioning_v1}/substances/<id>"
     )
 
-    #  is this jsonapi?  If not this should be treated differently
-    jsonapi.route(
-        SubstanceSearch, "resolved_substances", f"{api_versioning_v1}/resolver"
-    )
-
 
 @blueprint.before_app_first_request
 def register_views():
     apispec.spec.components.schema("UserSchema", schema=UserSchema)
     apispec.spec.path(view=UserResource, app=current_app)
     apispec.spec.path(view=UserList, app=current_app)
+
+    apispec.spec.components.schema("SubstanceSearchResultSchema", schema=SubstanceSearchResultSchema)
 
 
 @blueprint.errorhandler(ValidationError)
