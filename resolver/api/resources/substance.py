@@ -84,28 +84,6 @@ class SubstanceResource(ResourceDetail):
     schema = SubstanceSchema
     data_layer = {'session': db.session,
                   'model': Substance}
-    # method_decorators = [jwt_required]
-
-    # def get(self, substance_id):
-    #     schema = SubstanceSchema()
-    #     substance = Substance.query.get_or_404(substance_id)
-    #     return {"substance": schema.dump(substance)}
-    #
-    # def put(self, substance_id):
-    #     schema = SubstanceSchema(partial=True)
-    #     substance = Substance.query.get_or_404(substance_id)
-    #     substance = schema.load(request.json, instance=substance)
-    #
-    #     db.session.commit()
-    #
-    #     return {"msg": "substance updated", "substance": schema.dump(substance)}
-    #
-    # def delete(self, substance_id):
-    #     substance = Substance.query.get_or_404(substance_id)
-    #     db.session.delete(substance)
-    #     db.session.commit()
-    #
-    #     return {"msg": "substance deleted"}
 
 
 class SubstanceList(ResourceList):
@@ -149,15 +127,9 @@ class SubstanceList(ResourceList):
                   substance: SubstanceSchema
     """
 
-    # method_decorators = [jwt_required]
     schema = SubstanceSchema
     data_layer = {'session': db.session,
                   'model': Substance}
-
-    # def get(self):
-    #     schema = SubstanceSchema(many=True)
-    #     query = Substance.query
-    #     return paginate(query, schema)
 
 
 class SubstanceSearch(Resource):
