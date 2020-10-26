@@ -1,10 +1,11 @@
 from flask import request
-from flask_restful import Resource
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
 from resolver.models import Substance
 from resolver.extensions import db
 from resolver.commons.pagination import paginate
 from sqlalchemy.sql.expression import or_
+from sqlalchemy.orm.exc import NoResultFound
+from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList
 
@@ -149,6 +150,22 @@ class SubstanceSearchResultList(ResourceList):
                         items:
                           $ref: '#/components/schemas/SubstanceSearchResultSchema'
     """
+
+    def query(self, view_kwargs):
+        query_ = self.session.query(Substance)
+        if view_kwargs.get("id") is not None:
+            try:
+                self.session.query(Substance).filter_by(id=view_kwargs["id"]).one()
+            except NoResultFound:
+                raise ObjectNotFound(
+                    {"parameter": "id"},
+                    "Person: {} not found".format(view_kwargs["id"]),
+                )
+            else:
+                query_ = query_.join(Substance).filter(
+                    Substance.id == view_kwargs["id"]
+                )
+        return query_
 
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
