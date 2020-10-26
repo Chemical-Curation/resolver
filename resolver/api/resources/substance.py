@@ -128,7 +128,7 @@ class SubstanceList(ResourceList):
     data_layer = {"session": db.session, "model": Substance}
 
 
-class SubstanceSearch(Resource):
+class SubstanceSearchResultList(ResourceList):
     """
 
     ---
@@ -150,8 +150,12 @@ class SubstanceSearch(Resource):
                           $ref: '#/components/schemas/SubstanceSearchResultSchema'
     """
 
-    def get(self):
-        schema = SubstanceSearchResultSchema(many=True)
+    methods = ["GET"]
+    schema = SubstanceSearchResultSchema
+    data_layer = {"session": db.session, "model": Substance}
+
+    def get_custom(self):
+        print("get method on SubstanceSearchResultSchema")
         # PostgreSQL cheat sheet:
         # https://medium.com/hackernoon/how-to-query-jsonb-beginner-sheet-cheat-4da3aa5082a3
 

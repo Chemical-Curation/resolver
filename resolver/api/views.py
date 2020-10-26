@@ -8,9 +8,9 @@ from resolver.api.resources import (
     UserList,
     SubstanceResource,
     SubstanceList,
-    SubstanceSearch,
+    SubstanceSearchResultList,
 )
-from resolver.api.schemas import UserSchema
+from resolver.api.schemas import UserSchema, SubstanceSearchResultSchema
 
 api_versioning_v1 = "/api/v1"
 
@@ -28,10 +28,10 @@ def make_jsonapi(app):
     jsonapi.route(
         SubstanceResource, "substance_detail", f"{api_versioning_v1}/substances/<id>"
     )
-
-    #  is this jsonapi?  If not this should be treated differently
     jsonapi.route(
-        SubstanceSearch, "resolved_substances", f"{api_versioning_v1}/resolver"
+        SubstanceSearchResultList,
+        "resolved_substance_list",
+        f"{api_versioning_v1}/resolver",
     )
 
 

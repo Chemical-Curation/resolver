@@ -2,7 +2,7 @@ from resolver.api.resources.user import UserResource, UserList
 from resolver.api.resources.substance import (
     SubstanceResource,
     SubstanceList,
-    SubstanceSearch,
+    SubstanceSearchResultList,
 )
 
 
@@ -11,5 +11,5 @@ __all__ = [
     "UserList",
     "SubstanceResource",
     "SubstanceList",
-    "SubstanceSearch",
+    "SubstanceSearchResultList",
 ]

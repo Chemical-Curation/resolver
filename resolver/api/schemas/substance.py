@@ -29,6 +29,7 @@ class SubstanceSearchResultSchema(Schema):
 
     class Meta:
         type_ = "substance_search_results"
+        self_view_many = "resolved_substance_list"
         model = Substance
         sqla_session = db.session
         load_instance = True
