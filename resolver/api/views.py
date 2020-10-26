@@ -20,6 +20,7 @@ restful_api = RestfulApi(blueprint)
 
 restful_api.add_resource(UserList, "/users", endpoint="user_list")
 restful_api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user_detail")
+restful_api.add_resource(SubstanceSearch, "/resolver", endpoint="resolved_substances")
 
 
 def make_jsonapi(app):
@@ -40,6 +41,10 @@ def register_views():
     apispec.spec.components.schema("UserSchema", schema=UserSchema)
     apispec.spec.path(view=UserResource, app=current_app)
     apispec.spec.path(view=UserList, app=current_app)
+
+    apispec.spec.components.schema(
+        "SubstanceSearchResultSchema", schema=SubstanceSearchResultSchema
+    )
 
 
 @blueprint.errorhandler(ValidationError)
