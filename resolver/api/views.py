@@ -20,7 +20,6 @@ restful_api = RestfulApi(blueprint)
 
 restful_api.add_resource(UserList, "/users", endpoint="user_list")
 restful_api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user_detail")
-restful_api.add_resource(SubstanceSearch, "/resolver", endpoint="resolved_substances")
 
 
 def make_jsonapi(app):
