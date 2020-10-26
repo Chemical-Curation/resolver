@@ -153,43 +153,48 @@ class SubstanceSearchResultList(ResourceList):
 
     def query(self, view_kwargs):
         query_ = self.session.query(Substance)
-        if view_kwargs.get("id") is not None:
+        if request.args.get("identifier") is not None:
+            search_term = request.args.get("identifier")
+            print(f"searching for '{search_term}'")
             try:
-                self.session.query(Substance).filter_by(id=view_kwargs["id"]).one()
+                # make sure the query returns something
+                Substance.query.filter(
+                    or_(
+                        Substance.identifiers["preferred_name"].astext.contains(
+                            search_term
+                        ),
+                        Substance.identifiers["casrn"].astext.contains(search_term),
+                        Substance.identifiers["display_name"].astext.contains(
+                            search_term
+                        ),
+                    )
+                ).one()
             except NoResultFound:
                 raise ObjectNotFound(
-                    {"parameter": "id"},
-                    "Person: {} not found".format(view_kwargs["id"]),
+                    {"parameter": "identifier"},
+                    "Substance: {} not found".format(view_kwargs["id"]),
                 )
             else:
-                query_ = query_.join(Substance).filter(
-                    Substance.id == view_kwargs["id"]
+                print("query worked")
+                query_ = self.session.query(Substance).filter(
+                    or_(
+                        Substance.identifiers["preferred_name"].astext.contains(
+                            search_term
+                        ),
+                        Substance.identifiers["casrn"].astext.contains(search_term),
+                        Substance.identifiers["display_name"].astext.contains(
+                            search_term
+                        ),
+                    )
                 )
+                print(query_)
         return query_
 
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
-    data_layer = {"session": db.session, "model": Substance}
-
-    def get_custom(self):
-        print("get method on SubstanceSearchResultSchema")
-        # PostgreSQL cheat sheet:
-        # https://medium.com/hackernoon/how-to-query-jsonb-beginner-sheet-cheat-4da3aa5082a3
-
-        if request.args:
-            args = request.args
-            search_term = args["identifier"]
-            query = Substance.query.filter(
-                or_(
-                    Substance.identifiers["preferred_name"].astext.contains(
-                        search_term
-                    ),
-                    Substance.identifiers["casrn"].astext.contains(search_term),
-                    Substance.identifiers["display_name"].astext.contains(search_term),
-                )
-            )
-            return paginate(query, schema)
-        else:
-            return {
-                "msg": "no search string provided",
-            }
+    # get_schema_kwargs = {"identifier": ("identifier",)}
+    data_layer = {
+        "session": db.session,
+        "model": Substance,
+        "methods": {"query": query},
+    }

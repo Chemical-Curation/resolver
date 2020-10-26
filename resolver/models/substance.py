@@ -24,18 +24,24 @@ class Substance(db.Model):
 
     id = db.Column(db.String(128), primary_key=True)
     identifiers = db.Column(JSONB, nullable=False)
-    __table_args__ = (
-        db.Index(
-            "ix_sample",
-            text("(identifiers->'values') jsonb_path_ops"),
-            postgresql_using="gin",
-        ),
-        db.Index(
-            "ix_substances_tsv",
-            func.to_tsvector("english", identifiers),
-            postgresql_using="gin",
-        ),
-    )
 
     casrn = index_property("identifiers", "casrn", default=None)
     preferred_name = index_property("identifiers", "preferred_name", default=None)
+
+
+ix_identifiers = db.Index(
+    "ix_identifiers",
+    Substance.identifiers,
+    text("(identifiers->'values') jsonb_path_ops"),
+    postgresql_using="gin",
+)
+ix_identifiers_tsv = db.Index(
+    "ix_identifiers_tsv",
+    Substance.identifiers,
+    func.to_tsvector("english", Substance.identifiers),
+    postgresql_using="gin",
+)
+
+if __name__ == "__main__":
+    ix_identifiers.create(bind=db.engine)
+    ix_identifiers_tsv.create(bind=db.engine)
