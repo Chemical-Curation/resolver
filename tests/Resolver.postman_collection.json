@@ -23,7 +23,7 @@
 			"response": []
 		},
 		{
-			"name": "Search for \"Moperone\"",
+			"name": "Search for a preferred name",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -39,6 +39,52 @@
 						{
 							"key": "identifier",
 							"value": "Moperone"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search for a display name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/resolver?identifier=Moperone",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"resolver"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "Moperone"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search for a CASRN",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/resolver?identifier=7722-84-1",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"resolver"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "7722-84-1"
 						}
 					]
 				}
@@ -63,7 +109,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"data\": {\n        \"type\": \"substance\",\n        \"attributes\": {\n            \"id\": \"DTXSID302000003\",\n            \"identifiers\": {\n                \"preferred_name\": \"Moperone\",\n                \"casrn\": \"1050-79-9\",\n                \"inchikey\": \"AGAHNABIDCTLHW-UHFFFAOYSA-N\",\n                \"casalts\": [\n                    {\n                        \"casalt\": \"0001050799\",\n                        \"weight\": 0.5\n                    },\n                    {\n                        \"casalt\": \"1050799\",\n                        \"weight\": 0.5\n                    }\n                ],\n                \"synonyms\": [\n                    {\n                        \"synonym\": \"Meperon\",\n                        \"weight\": 0.75\n                    },\n                    {\n                        \"synonym\": \"Methylperidol\",\n                        \"weight\": 0.5\n                    }\n                ]\n            }\n        }\n    }\n}",
+					"raw": "{\n    \"data\": {\n        \"type\": \"substance\",\n        \"attributes\": {\n            \"id\": \"DTXSID302000003\",\n            \"identifiers\": {\n                \"preferred_name\": \"Moperone\",\n                \"display_name\": \"Moperone\",\n                \"casrn\": \"1050-79-9\",\n                \"inchikey\": \"AGAHNABIDCTLHW-UHFFFAOYSA-N\",\n                \"casalts\": [\n                    {\n                        \"casalt\": \"0001050799\",\n                        \"weight\": 0.5\n                    },\n                    {\n                        \"casalt\": \"1050799\",\n                        \"weight\": 0.5\n                    }\n                ],\n                \"synonyms\": [\n                    {\n                        \"synonym\": \"Meperon\",\n                        \"weight\": 0.75\n                    },\n                    {\n                        \"synonym\": \"Methylperidol\",\n                        \"weight\": 0.5\n                    }\n                ]\n            }\n        }\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -97,7 +143,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"data\": {\n        \"type\": \"substance\",\n        \"attributes\": {\n            \"id\": \"DTXSID9020584\",\n            \"identifiers\": {\n                \"preferred_name\": \"Ethanol\",\n                \"casrn\": \"64-17-5\",\n                \"inchikey\": \"LFQSCWFLJHTTHZ-UHFFFAOYSA-N\",\n                \"casalts\": [\n                    {\n                        \"casalt\": \"64175\",\n                        \"weight\": 0.5\n                    },\n                    {\n                        \"casalt\": \"00064175\",\n                        \"weight\": 0.5\n                    }\n                ],\n                \"synonyms\": [\n                    {\n                        \"synonym\": \"Alcohol, Ethyl\",\n                        \"weight\": 0.75\n                    },\n                    {\n                        \"synonym\": \"Alcohol\",\n                        \"weight\": 0.5\n                    }\n                ]\n            }\n        }\n    }\n}",
+					"raw": "{\n    \"data\": {\n        \"type\": \"substance\",\n        \"attributes\": {\n            \"id\": \"DTXSID9020584\",\n            \"identifiers\": {\n                \"preferred_name\": \"Ethanol\",\n                \"display_name\": \"Ethanol\",\n                \"casrn\": \"64-17-5\",\n                \"inchikey\": \"LFQSCWFLJHTTHZ-UHFFFAOYSA-N\",\n                \"casalts\": [\n                    {\n                        \"casalt\": \"64175\",\n                        \"weight\": 0.5\n                    },\n                    {\n                        \"casalt\": \"00064175\",\n                        \"weight\": 0.5\n                    }\n                ],\n                \"synonyms\": [\n                    {\n                        \"synonym\": \"Alcohol, Ethyl\",\n                        \"weight\": 0.75\n                    },\n                    {\n                        \"synonym\": \"Alcohol\",\n                        \"weight\": 0.5\n                    }\n                ]\n            }\n        }\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -131,7 +177,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"data\": {\n        \"type\": \"substance\",\n        \"attributes\": {\n            \"id\": \"DTXSID302000005\",\n            \"identifiers\": {\n        \"preferred_name\": \"Hydrogen peroxide\",\n        \"casrn\": \"7722-84-1\",\n        \"inchikey\": \"MHAJPDPJQMAIIY-UHFFFAOYSA-N\",\n        \"casalts\": [\n            {\n                \"casalt\": \"0007722841\",\n                \"weight\": 0.5\n            },\n            {\n                \"casalt\": \"7722841\",\n                \"weight\": 0.5\n            }\n        ],\n        \"synonyms\": [\n            {\n                \"synonym\": \"Hydrogen peroxide [USP]\",\n                \"weight\": 0.75\n            },\n            {\n                \"synonym\": \"Wasserstoffperoxid\",\n                \"weight\": 0.5\n            }\n        ]\n    }\n        }\n    }\n}\n\n\n\n\n\n    \n",
+					"raw": "{\n    \"data\": {\n        \"type\": \"substance\",\n        \"attributes\": {\n            \"id\": \"DTXSID302000005\",\n            \"identifiers\": {\n                \"preferred_name\": \"Hydrogen peroxide\",\n                \"display_name\": \"Hydrogen peroxide\",\n                \"casrn\": \"7722-84-1\",\n                \"inchikey\": \"MHAJPDPJQMAIIY-UHFFFAOYSA-N\",\n                \"casalts\": [\n                    {\n                        \"casalt\": \"0007722841\",\n                        \"weight\": 0.5\n                    },\n                    {\n                        \"casalt\": \"7722841\",\n                        \"weight\": 0.5\n                    }\n                ],\n                \"synonyms\": [\n                    {\n                        \"synonym\": \"Hydrogen peroxide [USP]\",\n                        \"weight\": 0.75\n                    },\n                    {\n                        \"synonym\": \"Wasserstoffperoxid\",\n                        \"weight\": 0.5\n                    }\n                ]\n            }\n        }\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -165,7 +211,7 @@
 			"response": []
 		},
 		{
-			"name": "DELETE DTXSID9020584",
+			"name": "DELETE Ethanol, DTXSID9020584",
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -182,7 +228,7 @@
 			"response": []
 		},
 		{
-			"name": "DELETE DTXSID302000005",
+			"name": "DELETE Hydrogen peroxide DTXSID302000005",
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -223,7 +269,7 @@
 	],
 	"variable": [
 		{
-			"id": "bd262d10-2240-4759-bc94-b7054fb36aea",
+			"id": "b28b9cb9-42e0-42c3-8ba5-64af16467b37",
 			"key": "BaseURL",
 			"value": "http://localhost:5000/api/v1/"
 		}
