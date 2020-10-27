@@ -155,7 +155,6 @@ class SubstanceSearchResultList(ResourceList):
         query_ = self.session.query(Substance)
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
-            print(f"searching for '{search_term}'")
             try:
                 # make sure the query returns something
                 Substance.query.filter(
@@ -170,12 +169,14 @@ class SubstanceSearchResultList(ResourceList):
                     )
                 ).one()
             except NoResultFound:
+                # TODO: should this return a 200 code but with an empty [] array?
                 raise ObjectNotFound(
                     {"parameter": "identifier"},
-                    "Substance: {} not found".format(view_kwargs["id"]),
+                    "Identifer {} did not resolve to a substance".format(
+                        request.args["identifier"]
+                    ),
                 )
             else:
-                print("query worked")
                 query_ = self.session.query(Substance).filter(
                     or_(
                         Substance.identifiers["preferred_name"].astext.contains(
@@ -187,7 +188,6 @@ class SubstanceSearchResultList(ResourceList):
                         ),
                     )
                 )
-                print(query_)
         return query_
 
     methods = ["GET"]

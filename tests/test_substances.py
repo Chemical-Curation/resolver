@@ -95,6 +95,7 @@ def test_create_substance(client, db):
     data["data"]["id"] = "DTXCID302000999"
     idents = {
         "preferred_name": "Miracle Whip",
+        "display_name": "Miracle Whip",
         "casrn": "1050-79-9",
         "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
         "casalts": [
@@ -136,3 +137,61 @@ def test_get_all_substances(client, db, substance_factory):
     results = rep.get_json()
     for substance in substances:
         assert any(c["id"] == substance.id for c in results["data"])
+
+
+def test_resolve_substance(client, db, substance):
+
+    # TODO: replace this with factories and ORM creation once we figure out how to
+    # maintain valid JSON in the identifiers field
+    substances_url = url_for("substance_list")
+    data = {"data": {"id": "", "type": "substance", "attributes": {}}}
+
+    data["data"]["id"] = "DTXCID302000999"
+    idents = {
+        "preferred_name": "Miracle Whip",
+        "display_name": "Kraft Miracle Whip Original Dressing",
+        "casrn": "1050-79-9",
+        "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
+        "casalts": [
+            {"casalt": "0001050799", "weight": 0.5},
+            {"casalt": "1050799", "weight": 0.5},
+        ],
+        "synonyms": [
+            {"synonym": "Meperon", "weight": 0.75},
+            {"synonym": "Methylperidol", "weight": 0.5},
+        ],
+    }
+    data["data"]["attributes"]["identifiers"] = idents
+
+    rep = client.post(
+        substances_url, json=data, headers={"content-type": "application/vnd.api+json"}
+    )
+
+    # test non-resolving identifier
+    search_url = url_for("resolved_substance_list", identifier="Foobar")
+    rep = client.get(search_url)
+    assert rep.status_code == 404
+
+    # test preferred name match
+    preferred_name = "Miracle Whip"
+    search_url = url_for("resolved_substance_list", identifier=preferred_name)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+
+    # test CASRN match
+    casrn = "1050-79-9"
+    search_url = url_for("resolved_substance_list", identifier=casrn)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+
+    # test display name match
+    display_name = "Kraft Miracle Whip Original Dressing"
+    search_url = url_for("resolved_substance_list", identifier=display_name)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+
+    # test name containment
+    partial_name = "Miracle"
+    search_url = url_for("resolved_substance_list", identifier=partial_name)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
