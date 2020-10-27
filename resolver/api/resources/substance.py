@@ -156,6 +156,8 @@ class SubstanceSearchResultList(ResourceList):
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
             try:
+                # TODO: allow incorrectly spelled search terms
+                # https://github.com/Chemical-Curation/chemcurator_django/issues/208
                 # make sure the query returns something
                 Substance.query.filter(
                     or_(
@@ -190,11 +192,23 @@ class SubstanceSearchResultList(ResourceList):
                 )
         return query_
 
+    def after_get_collection(self, collection, qs, view_kwargs):
+        """
+        TODO: Scoring the members of the collection could happen here
+        See https://github.com/Chemical-Curation/chemcurator_django/issues/144
+        This method could also populate the `matches` field in the serialized
+        SubstanceSearchResultSchema
+        """
+        pass
+
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
     # get_schema_kwargs = {"identifier": ("identifier",)}
     data_layer = {
         "session": db.session,
         "model": Substance,
-        "methods": {"query": query},
+        "methods": {
+            "query": query,
+            # "after_get_collection": after_get_collection,
+        },
     }

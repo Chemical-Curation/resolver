@@ -24,7 +24,8 @@ class SubstanceSearchResultSchema(Schema):
     matches = fields.Function(
         lambda obj: "[{}, {}]".format("matching field 1", "matching field 2")
     )
-    # the score will be calculated in the resolver method
+    # the score will be calculated in the resolver 
+    # https://github.com/Chemical-Curation/chemcurator_django/issues/144
     score = fields.Function(lambda obj: 1)
 
     class Meta:
