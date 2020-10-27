@@ -1,14 +1,13 @@
-import json
 from flask import request
-from flask_restful import Resource
-from api.resolver_api.schemas import SubstanceSchema, SubstanceSearchResultSchema
-from api.models import Substance
-from api.extensions import db
-from api.commons.pagination import paginate
+from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
+from resolver.models import Substance
+from resolver.extensions import db
+from resolver.commons.pagination import paginate
 from sqlalchemy.sql.expression import or_
+from sqlalchemy.orm.exc import NoResultFound
+from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList
-from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 
 class SubstanceResource(ResourceDetail):
@@ -81,28 +80,8 @@ class SubstanceResource(ResourceDetail):
           description: substance does not exist
     """
 
-    # method_decorators = [jwt_required]
-
-    def get(self, substance_id):
-        schema = SubstanceSchema()
-        substance = Substance.query.get_or_404(substance_id)
-        return {"substance": schema.dump(substance)}
-
-    def put(self, substance_id):
-        schema = SubstanceSchema(partial=True)
-        substance = Substance.query.get_or_404(substance_id)
-        substance = schema.load(request.json, instance=substance)
-
-        db.session.commit()
-
-        return {"msg": "substance updated", "substance": schema.dump(substance)}
-
-    def delete(self, substance_id):
-        substance = Substance.query.get_or_404(substance_id)
-        db.session.delete(substance)
-        db.session.commit()
-
-        return {"msg": "substance deleted"}
+    schema = SubstanceSchema
+    data_layer = {"session": db.session, "model": Substance}
 
 
 class SubstanceList(ResourceList):
@@ -146,30 +125,11 @@ class SubstanceList(ResourceList):
                   substance: SubstanceSchema
     """
 
-    # method_decorators = [jwt_required]
-
-    def get(self):
-        schema = SubstanceSchema(many=True)
-        query = Substance.query
-        return paginate(query, schema)
-
-    def post(self):
-        """This post needs to handle both updates and creates."""
-
-        # For now, we are skipping the SubstanceSchema object and
-        # deserializing the request's JSON straight into the ORM
-        substance = Substance.query.get(request.json.get("id")) or Substance(**request.json)
-        # Later we can return to this step and get it working:
-        # schema = SubstanceSchema()
-        # substance = schema.load(request.json)
-
-        db.session.add(substance)
-        db.session.commit()
-
-        return {"msg": "substance created", "substance": {}}, 201
+    schema = SubstanceSchema
+    data_layer = {"session": db.session, "model": Substance}
 
 
-class SubstanceSearch(Resource):
+class SubstanceSearchResultList(ResourceList):
     """
 
     ---
@@ -191,25 +151,64 @@ class SubstanceSearch(Resource):
                           $ref: '#/components/schemas/SubstanceSearchResultSchema'
     """
 
-    def get(self):
-        schema = SubstanceSearchResultSchema(many=True)
-        # PostgreSQL cheat sheet:
-        # https://medium.com/hackernoon/how-to-query-jsonb-beginner-sheet-cheat-4da3aa5082a3
-
-        if request.args:
-            args = request.args
-            search_term = args["identifier"]
-            query = Substance.query.filter(
-                or_(
-                    Substance.identifiers["preferred_name"].astext.contains(
-                        search_term
+    def query(self, view_kwargs):
+        query_ = self.session.query(Substance)
+        if request.args.get("identifier") is not None:
+            search_term = request.args.get("identifier")
+            try:
+                # TODO: allow incorrectly spelled search terms
+                # https://github.com/Chemical-Curation/chemcurator_django/issues/208
+                # make sure the query returns something
+                Substance.query.filter(
+                    or_(
+                        Substance.identifiers["preferred_name"].astext.contains(
+                            search_term
+                        ),
+                        Substance.identifiers["casrn"].astext.contains(search_term),
+                        Substance.identifiers["display_name"].astext.contains(
+                            search_term
+                        ),
+                    )
+                ).one()
+            except NoResultFound:
+                # TODO: should this return a 200 code but with an empty [] array?
+                raise ObjectNotFound(
+                    {"parameter": "identifier"},
+                    "Identifer {} did not resolve to a substance".format(
+                        request.args["identifier"]
                     ),
-                    Substance.identifiers["casrn"].astext.contains(search_term),
-                    Substance.identifiers["display_name"].astext.contains(search_term),
                 )
-            )
-            return paginate(query, schema)
-        else:
-            return {
-                "msg": "no search string provided",
-            }
+            else:
+                query_ = self.session.query(Substance).filter(
+                    or_(
+                        Substance.identifiers["preferred_name"].astext.contains(
+                            search_term
+                        ),
+                        Substance.identifiers["casrn"].astext.contains(search_term),
+                        Substance.identifiers["display_name"].astext.contains(
+                            search_term
+                        ),
+                    )
+                )
+        return query_
+
+    def after_get_collection(self, collection, qs, view_kwargs):
+        """
+        TODO: Scoring the members of the collection could happen here
+        See https://github.com/Chemical-Curation/chemcurator_django/issues/144
+        This method could also populate the `matches` field in the serialized
+        SubstanceSearchResultSchema
+        """
+        pass
+
+    methods = ["GET"]
+    schema = SubstanceSearchResultSchema
+    # get_schema_kwargs = {"identifier": ("identifier",)}
+    data_layer = {
+        "session": db.session,
+        "model": Substance,
+        "methods": {
+            "query": query,
+            # "after_get_collection": after_get_collection,
+        },
+    }

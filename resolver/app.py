@@ -1,20 +1,21 @@
 from flask import Flask
 
-from api import auth
-from api.resolver_api import views as api_views
-from api.extensions import db, jwt, migrate, apispec
+from resolver import auth
+from resolver.api import views as api_views
+from resolver.extensions import db, jwt, migrate, apispec, init_db
 
 
 def create_app(testing=False, cli=False):
     """Application factory, used to create application"""
-    app = Flask("api")
-    app.config.from_object("api.config.Config")
+    app = Flask("resolver")
+    app.config.from_object("resolver.config")
     # this is the only place I was able to reliably set this variable
     # and avoid getting nagged about it
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     if testing is True:
         app.config["TESTING"] = True
+        init_db()
 
     configure_extensions(app, cli)
     configure_apispec(app)
@@ -55,3 +56,4 @@ def register_blueprints(app):
     """register all blueprints for application"""
     app.register_blueprint(auth.views.blueprint)
     app.register_blueprint(api_views.blueprint)
+    api_views.make_jsonapi(app)

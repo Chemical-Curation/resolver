@@ -1,34 +1,38 @@
 from flask import Blueprint, current_app, jsonify
-from flask_restful import Api
+from flask_rest_jsonapi import Api as JsonApi
+from flask_restful import Api as RestfulApi
 from marshmallow import ValidationError
-from api.extensions import apispec
-from api.resolver_api.resources import (
+from resolver.extensions import apispec
+from resolver.api.resources import (
     UserResource,
     UserList,
     SubstanceResource,
     SubstanceList,
-    SubstanceSearch,
+    SubstanceSearchResultList,
 )
-from api.resolver_api.schemas import (
-    UserSchema,
-    SubstanceSchema,
-    SubstanceSearchResultSchema,
-)
+from resolver.api.schemas import UserSchema, SubstanceSearchResultSchema
 
+api_versioning_v1 = "/api/v1"
 
 blueprint = Blueprint("api", __name__, url_prefix="/api/v1")
-api = Api(blueprint)
+restful_api = RestfulApi(blueprint)
 
 
-api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user_by_id")
-api.add_resource(UserList, "/users", endpoint="users")
+restful_api.add_resource(UserList, "/users", endpoint="user_list")
+restful_api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user_detail")
 
-api.add_resource(
-    SubstanceResource, "/substances/<substance_id>", endpoint="substance_by_id"
-)
-api.add_resource(SubstanceList, "/substances", endpoint="substances")
 
-api.add_resource(SubstanceSearch, "/resolver", endpoint="resolved_substances")
+def make_jsonapi(app):
+    jsonapi = JsonApi(app=app)
+    jsonapi.route(SubstanceList, "substance_list", f"{api_versioning_v1}/substances")
+    jsonapi.route(
+        SubstanceResource, "substance_detail", f"{api_versioning_v1}/substances/<id>"
+    )
+    jsonapi.route(
+        SubstanceSearchResultList,
+        "resolved_substance_list",
+        f"{api_versioning_v1}/resolver",
+    )
 
 
 @blueprint.before_app_first_request
@@ -36,10 +40,6 @@ def register_views():
     apispec.spec.components.schema("UserSchema", schema=UserSchema)
     apispec.spec.path(view=UserResource, app=current_app)
     apispec.spec.path(view=UserList, app=current_app)
-
-    apispec.spec.components.schema("SubstanceSchema", schema=SubstanceSchema)
-    apispec.spec.path(view=SubstanceResource, app=current_app)
-    apispec.spec.path(view=SubstanceList, app=current_app)
 
     apispec.spec.components.schema(
         "SubstanceSearchResultSchema", schema=SubstanceSearchResultSchema

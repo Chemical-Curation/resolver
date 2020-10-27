@@ -1,11 +1,10 @@
 import json
 import pytest
-import psycopg2
 from dotenv import load_dotenv
 
-from api.models import User
-from api.app import create_app
-from api.extensions import db as _db
+from resolver.models import User
+from resolver.app import create_app
+from resolver.extensions import db as _db
 from pytest_factoryboy import register
 from tests.factories import UserFactory, SubstanceFactory
 
@@ -50,12 +49,12 @@ def admin_headers(admin_user, client):
     rep = client.post(
         "/auth/login",
         data=json.dumps(data),
-        headers={"content-type": "application/json"},
+        headers={"content-type": "application/vnd.api+json"},
     )
 
     tokens = json.loads(rep.get_data(as_text=True))
     return {
-        "content-type": "application/json",
+        "content-type": "application/vnd.api+json",
         "authorization": "Bearer %s" % tokens["access_token"],
     }
 
@@ -66,11 +65,11 @@ def admin_refresh_headers(admin_user, client):
     rep = client.post(
         "/auth/login",
         data=json.dumps(data),
-        headers={"content-type": "application/json"},
+        headers={"content-type": "application/vnd.api+json"},
     )
 
     tokens = json.loads(rep.get_data(as_text=True))
     return {
-        "content-type": "application/json",
+        "content-type": "application/vnd.api+json",
         "authorization": "Bearer %s" % tokens["refresh_token"],
     }

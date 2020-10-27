@@ -9,7 +9,7 @@ from flask_jwt_extended import JWTManager
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 
-from api.commons.apispec import APISpecExt
+from resolver.commons.apispec import APISpecExt
 
 
 db = SQLAlchemy()
@@ -18,3 +18,13 @@ ma = Marshmallow()
 migrate = Migrate()
 apispec = APISpecExt()
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
+
+
+def init_db():
+    from resolver.config import SQLALCHEMY_DATABASE_URI
+    from sqlalchemy import create_engine
+    from sqlalchemy_utils import database_exists, create_database
+
+    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+    if not database_exists(engine.url):
+        create_database(engine.url)

@@ -1,8 +1,8 @@
 .PHONY: init init-migration build run db-migrate test tox
 
 init:  build run
-	docker-compose exec web api db upgrade
-	docker-compose exec web api init
+	docker-compose exec web resolver db upgrade
+	docker-compose exec web resolver init
 	@echo "Init done, containers running"
 
 build:
@@ -12,10 +12,10 @@ run:
 	docker-compose up -d
 
 db-migrate:
-	docker-compose exec web api db migrate
+	docker-compose exec web resolver db migrate
 
 db-upgrade:
-	docker-compose exec web api db upgrade
+	docker-compose exec web resolver db upgrade
 
 test:
 	docker-compose run -v $(PWD)/tests:/code/tests:ro web tox -e test

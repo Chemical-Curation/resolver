@@ -1,5 +1,5 @@
-from api.resolver_api.schemas.user import UserSchema
-from api.resolver_api.schemas.substance import (
+from resolver.api.schemas.user import UserSchema
+from resolver.api.schemas.substance import (
     SubstanceSchema,
     SubstanceSearchResultSchema,
 )
