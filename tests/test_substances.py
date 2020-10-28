@@ -167,7 +167,7 @@ def test_resolve_substance(client, db, substance):
         substances_url, json=data, headers={"content-type": "application/vnd.api+json"}
     )
 
-    ### second substance
+    # second substance
     data = {"data": {"id": "", "type": "substance", "attributes": {}}}
 
     data["data"]["id"] = "DTXSID60191004"
