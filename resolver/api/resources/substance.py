@@ -169,7 +169,7 @@ class SubstanceSearchResultList(ResourceList):
                             search_term
                         ),
                     )
-                ).one()
+                ).first()
             except NoResultFound:
                 # TODO: should this return a 200 code but with an empty [] array?
                 raise ObjectNotFound(
