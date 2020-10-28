@@ -146,7 +146,7 @@ def test_resolve_substance(client, db, substance):
     substances_url = url_for("substance_list")
     data = {"data": {"id": "", "type": "substance", "attributes": {}}}
 
-    data["data"]["id"] = "DTXCID302000999"
+    data["data"]["id"] = "DTXSID302000999"
     idents = {
         "preferred_name": "Miracle Whip",
         "display_name": "Kraft Miracle Whip Original Dressing",
@@ -159,6 +159,32 @@ def test_resolve_substance(client, db, substance):
         "synonyms": [
             {"synonym": "Meperon", "weight": 0.75},
             {"synonym": "Methylperidol", "weight": 0.5},
+        ],
+    }
+    data["data"]["attributes"]["identifiers"] = idents
+
+    rep = client.post(
+        substances_url, json=data, headers={"content-type": "application/vnd.api+json"}
+    )
+
+    ### second substance
+    data = {"data": {"id": "", "type": "substance", "attributes": {}}}
+
+    data["data"]["id"] = "DTXSID60191004"
+    idents = {
+        "preferred_name": "Butyric acid, 2-(5-nitro-alpha-iminofurfuryl)hydrazide",
+        "display_name": "Butyric acid Original Dressing",
+        "casrn": "3757-31-1",
+        "inchikey": "UUTBLVFYDQGDNV-UHFFFAOYSA-N",
+        "casalts": [
+            {"casalt": "3757-31-1", "weight": 0.5},
+        ],
+        "synonyms": [
+            {
+                "synonym": "Butyric acid, 2-(5-nitro-alpha-iminofurfuryl)hydrazide",
+                "weight": 0.75,
+            },
+            {"synonym": "N'-Butanoyl-5-nitrofuran-2-carbohydrazonamide", "weight": 0.5},
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
@@ -211,3 +237,11 @@ def test_resolve_substance(client, db, substance):
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
+
+    # test multiple matches
+    partial_name = "Original Dressing"
+    search_url = url_for("resolved_substance_list", identifier=partial_name)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 2}
