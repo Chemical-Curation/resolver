@@ -170,7 +170,7 @@ def test_resolve_substance(client, db, substance):
     # test non-resolving identifier
     search_url = url_for("resolved_substance_list", identifier="Foobar")
     rep = client.get(search_url)
-    assert rep.status_code == 404
+    assert rep.status_code == 200
 
     # test preferred name match
     preferred_name = "Miracle Whip"

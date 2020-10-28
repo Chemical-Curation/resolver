@@ -181,12 +181,12 @@ class SubstanceSearchResultList(ResourceList):
             else:
                 query_ = self.session.query(Substance).filter(
                     or_(
-                        Substance.identifiers["preferred_name"].astext.contains(
-                            search_term
+                        Substance.identifiers["preferred_name"].astext.ilike(
+                            f"%{search_term}%"
                         ),
-                        Substance.identifiers["casrn"].astext.contains(search_term),
-                        Substance.identifiers["display_name"].astext.contains(
-                            search_term
+                        Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
+                        Substance.identifiers["display_name"].astext.ilike(
+                            f"%{search_term}%"
                         ),
                     )
                 )
