@@ -171,18 +171,24 @@ def test_resolve_substance(client, db, substance):
     search_url = url_for("resolved_substance_list", identifier="Foobar")
     rep = client.get(search_url)
     assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["data"] == []
 
     # test preferred name match
     preferred_name = "Miracle Whip"
     search_url = url_for("resolved_substance_list", identifier=preferred_name)
     rep = client.get(search_url)
     assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
 
     # test CASRN match
     casrn = "1050-79-9"
     search_url = url_for("resolved_substance_list", identifier=casrn)
     rep = client.get(search_url)
     assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
 
     # test display name match
     display_name = "Kraft Miracle Whip Original Dressing"
@@ -195,3 +201,13 @@ def test_resolve_substance(client, db, substance):
     search_url = url_for("resolved_substance_list", identifier=partial_name)
     rep = client.get(search_url)
     assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+
+    # test case insensitivity
+    partial_name = "miracle"
+    search_url = url_for("resolved_substance_list", identifier=partial_name)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
