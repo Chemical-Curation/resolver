@@ -1,0 +1,14 @@
+-e .
+# Wait, what?
+# https://stackoverflow.com/questions/43658870/requirements-txt-vs-setup-py
+
+# The packages you will need in your local dev environment for testing:
+black==20.8b1
+flake8==3.8.4
+faker==4.1.1
+pytest==6.1.1
+pytest-runner==5.2
+pytest-flask==1.0.0
+pytest-factoryboy==2.0.3
+factory_boy==3.1.0
+sqlalchemy-utils==0.36.8
