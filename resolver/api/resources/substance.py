@@ -128,6 +128,73 @@ class SubstanceList(ResourceList):
     data_layer = {"session": db.session, "model": Substance}
 
 
+class SubstanceIndexResource(ResourceDetail):
+    """Create and Update an indexed substance
+
+    ---
+    patch:
+      tags:
+        - substance
+      parameters:
+        - in: path
+          name: sid
+          schema:
+            type: string
+            example: DTXSID1020000000
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: substance
+                        id:
+                          type: string
+                          example: DTXSID1020000000
+                        attributes:
+                          type: object
+                          properties:
+                            identifier:
+                              type: object
+      responses:
+        200:
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: substance
+                          id:
+                            type: sid
+                            example: DTXSID1020000000
+                          attributes:
+                            type: object
+                            properties:
+                              identifier:
+                                type: object
+    """
+
+    schema = SubstanceSchema
+    data_layer = {"session": db.session, "model": Substance}
+    methods = ["PATCH"]
+
+    def update_object(self, data, qs, kwargs):
+        obj = self._data_layer.model(**data)
+        return self._data_layer.session.merge(obj)
+
+
 class SubstanceSearchResultList(ResourceList):
     """
 
