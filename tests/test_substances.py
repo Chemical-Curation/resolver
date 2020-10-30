@@ -1,4 +1,7 @@
+import pytest
 from flask import url_for
+
+from resolver.api.schemas import SubstanceSchema
 from resolver.models import Substance
 
 
@@ -245,3 +248,17 @@ def test_resolve_substance(client, db, substance):
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 2}
+
+
+# Tests both create and update functionality using param create_test.
+@pytest.mark.parametrize("create_test", [pytest.param(False), pytest.param(True)])
+def test_substance_index(client, db, substance_factory, create_test):
+    url = url_for("substance_index")
+    if create_test:
+        # instance to be created
+        instance = substance_factory.build()
+    else:
+        # instance to be updated
+        instance = substance_factory.create()
+    json = SubstanceSchema().dump(instance)
+    client.post(url, data=json, headers={"content-type": "application/vnd.api+json"})

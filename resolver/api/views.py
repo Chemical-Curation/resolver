@@ -16,7 +16,7 @@ from resolver.api.schemas import UserSchema, SubstanceSearchResultSchema
 
 api_versioning_v1 = "/api/v1"
 
-blueprint = Blueprint("api", __name__, url_prefix="/api/v1")
+blueprint = Blueprint("api", __name__, url_prefix=api_versioning_v1)
 restful_api = RestfulApi(blueprint)
 
 
@@ -32,8 +32,8 @@ def make_jsonapi(app):
     )
     jsonapi.route(
         SubstanceIndexResource,
-        "substance_indexing",
-        f"{api_versioning_v1}/substances/_index/<id>",
+        "substance_index",
+        f"{api_versioning_v1}/substances/_index",
     )
     jsonapi.route(
         SubstanceSearchResultList,

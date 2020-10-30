@@ -128,19 +128,13 @@ class SubstanceList(ResourceList):
     data_layer = {"session": db.session, "model": Substance}
 
 
-class SubstanceIndexResource(ResourceDetail):
+class SubstanceIndexResource(ResourceList):
     """Create and Update an indexed substance
 
     ---
     patch:
       tags:
         - substance
-      parameters:
-        - in: path
-          name: sid
-          schema:
-            type: string
-            example: DTXSID1020000000
       requestBody:
         content:
           application/vnd.api+json:
@@ -163,7 +157,7 @@ class SubstanceIndexResource(ResourceDetail):
                             identifier:
                               type: object
       responses:
-        200:
+        201:
           content:
             application/vnd.api+json:
               schema:
@@ -188,11 +182,29 @@ class SubstanceIndexResource(ResourceDetail):
 
     schema = SubstanceSchema
     data_layer = {"session": db.session, "model": Substance}
-    methods = ["PATCH"]
+    methods = ["POST"]
 
-    def update_object(self, data, qs, kwargs):
+    def create_object(self, data, kwargs):
+        """Creates or updates a model object
+
+        Note:
+            This is a limited extension of
+            `flask_rest_jsonapi/data_layers/alchemy.py`
+            to allow for merges.
+            This will not handle relationships as there is no foreseeable need.
+
+        Args:
+            :param dict data: the data validated by marshmallow
+            :param dict kwargs: kwargs from the resource view
+
+        Returns:
+            :return DeclarativeMeta: an object from sqlalchemy
+        """
+
         obj = self._data_layer.model(**data)
-        return self._data_layer.session.merge(obj)
+        self._data_layer.session.merge(obj)
+        self._data_layer.session.commit()
+        return obj
 
 
 class SubstanceSearchResultList(ResourceList):
