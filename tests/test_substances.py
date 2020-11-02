@@ -254,11 +254,40 @@ def test_resolve_substance(client, db, substance):
 @pytest.mark.parametrize("create_test", [pytest.param(False), pytest.param(True)])
 def test_substance_index(client, db, substance_factory, create_test):
     url = url_for("substance_index")
+
     if create_test:
         # instance to be created
         instance = substance_factory.build()
     else:
         # instance to be updated
         instance = substance_factory.create()
-    json = SubstanceSchema().dump(instance)
-    client.post(url, data=json, headers={"content-type": "application/vnd.api+json"})
+        db.session.add(instance)
+        db.session.commit()
+    substance_dict = SubstanceSchema().dump(instance)
+    resp = client.post(
+        url, json=substance_dict, headers={"content-type": "application/vnd.api+json"}
+    )
+
+    assert resp.status_code == 201
+    results = resp.get_json()
+    assert results["data"]["attributes"]["identifiers"] == instance.identifiers
+
+
+def test_substance_index_delete(client, db, substance_factory):
+    url = url_for("substance_index")
+
+    # Create a Substance.  Add to test database
+    sub = substance_factory.create()
+    db.session.add(sub)
+    db.session.commit()
+    assert Substance.query.count() != 0
+
+    # Delete entire index
+    resp = client.delete(url, headers={"content-type": "application/vnd.api+json"})
+    results = resp.get_json()
+
+    # Verify response and database state
+    assert resp.status_code == 200
+    assert "Substance Index successfully cleared" in results["meta"]["message"]
+    assert Substance.query.count() == 0
+

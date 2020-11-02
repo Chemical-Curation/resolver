@@ -134,7 +134,7 @@ class SubstanceIndexResource(ResourceList):
     ---
     patch:
       tags:
-        - substance
+        - substance_index
       requestBody:
         content:
           application/vnd.api+json:
@@ -178,11 +178,28 @@ class SubstanceIndexResource(ResourceList):
                             properties:
                               identifier:
                                 type: object
+    delete:
+      tags:
+        - substance_index
+      responses:
+        200:
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      meta:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: Database successfully cleared. __rows__ rows deleted
     """
 
     schema = SubstanceSchema
     data_layer = {"session": db.session, "model": Substance}
-    methods = ["POST"]
+    methods = ["POST", "DELETE"]
 
     def create_object(self, data, kwargs):
         """Creates or updates a model object
@@ -205,6 +222,24 @@ class SubstanceIndexResource(ResourceList):
         self._data_layer.session.merge(obj)
         self._data_layer.session.commit()
         return obj
+
+    def delete(self):
+        """Delete an object"""
+        rows_deleted = self.delete_db()
+
+        result = {
+            "meta": {
+                "message": f"Substance Index successfully cleared. {rows_deleted} rows deleted"
+            }
+        }
+
+        return result
+
+    def delete_db(self):
+        rows_deleted = self._data_layer.model.query.delete()
+        self._data_layer.session.commit()
+
+        return rows_deleted
 
 
 class SubstanceSearchResultList(ResourceList):
