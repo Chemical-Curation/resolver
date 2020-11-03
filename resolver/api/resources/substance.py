@@ -1,4 +1,6 @@
 from flask import request
+from sqlalchemy import func
+
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
 from resolver.models import Substance
 from resolver.extensions import db
@@ -150,45 +152,25 @@ class SubstanceSearchResultList(ResourceList):
                           $ref: '#/components/schemas/SubstanceSearchResultSchema'
     """
 
+    # todo: remove.  This is a sample query to hopefully save me from forgetting it.
+    # Substance.query.select_from(Substance, func.jsonb_array_elements(Substance.identifiers['synonyms']).alias()).filter(Substance.val['identifier'].astext.contains("sonfwonaofw")).all()
+
     def query(self, view_kwargs):
         query_ = self.session.query(Substance)
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
-            try:
-                # TODO: allow incorrectly spelled search terms
-                # https://github.com/Chemical-Curation/chemcurator_django/issues/208
-                # make sure the query returns something
-                Substance.query.filter(
-                    or_(
-                        Substance.identifiers["preferred_name"].astext.contains(
-                            search_term
-                        ),
-                        Substance.identifiers["casrn"].astext.contains(search_term),
-                        Substance.identifiers["display_name"].astext.contains(
-                            search_term
-                        ),
-                    )
-                ).first()
-            except NoResultFound:
-                # TODO: should this return a 200 code but with an empty [] array?
-                raise ObjectNotFound(
-                    {"parameter": "identifier"},
-                    "Identifer {} did not resolve to a substance".format(
-                        request.args["identifier"]
+            query_ = self.session.query(Substance).select_from(Substance, func.jsonb_array_elements(Substance.identifiers['synonyms']).alias()).filter(
+                or_(
+                    Substance.identifiers["preferred_name"].astext.ilike(
+                        f"%{search_term}%"
                     ),
+                    Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
+                    Substance.identifiers["display_name"].astext.ilike(
+                        f"%{search_term}%"
+                    ),
+                    Substance.val['identifier'].astext.ilike(f"%{search_term}%")
                 )
-            else:
-                query_ = self.session.query(Substance).filter(
-                    or_(
-                        Substance.identifiers["preferred_name"].astext.ilike(
-                            f"%{search_term}%"
-                        ),
-                        Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
-                        Substance.identifiers["display_name"].astext.ilike(
-                            f"%{search_term}%"
-                        ),
-                    )
-                )
+            )
         return query_
 
     def after_get_collection(self, collection, qs, view_kwargs):
