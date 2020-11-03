@@ -1,12 +1,11 @@
 from flask import request
 from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import JSONB
 
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
 from resolver.models import Substance
 from resolver.extensions import db
 from sqlalchemy.sql.expression import or_
-from sqlalchemy.orm.exc import NoResultFound
-from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList
 
@@ -152,23 +151,33 @@ class SubstanceSearchResultList(ResourceList):
                           $ref: '#/components/schemas/SubstanceSearchResultSchema'
     """
 
-    # todo: remove.  This is a sample query to hopefully save me from forgetting it.
-    # Substance.query.select_from(Substance, func.jsonb_array_elements(Substance.identifiers['synonyms']).alias()).filter(Substance.val['identifier'].astext.contains("sonfwonaofw")).all()
-
     def query(self, view_kwargs):
         query_ = self.session.query(Substance)
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
-            query_ = self.session.query(Substance).select_from(Substance, func.jsonb_array_elements(Substance.identifiers['synonyms']).alias()).filter(
-                or_(
-                    Substance.identifiers["preferred_name"].astext.ilike(
-                        f"%{search_term}%"
+
+            # This allows reference to the aliased results from synonym select_from jsonb_array_elements
+            synonyms = db.column("synonyms", type_=JSONB)
+
+            query_ = (
+                self.session.query(Substance)
+                # Flatten synonyms in an additional jsonb object.
+                .select_from(
+                    Substance,
+                    func.jsonb_array_elements(Substance.identifiers["synonyms"]).alias(
+                        "synonyms"
                     ),
-                    Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
-                    Substance.identifiers["display_name"].astext.ilike(
-                        f"%{search_term}%"
-                    ),
-                    Substance.val['identifier'].astext.ilike(f"%{search_term}%")
+                ).filter(
+                    or_(
+                        Substance.identifiers["preferred_name"].astext.ilike(
+                            f"%{search_term}%"
+                        ),
+                        Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
+                        Substance.identifiers["display_name"].astext.ilike(
+                            f"%{search_term}%"
+                        ),
+                        synonyms["identifier"].astext.ilike(f"%{search_term}%"),
+                    )
                 )
             )
         return query_

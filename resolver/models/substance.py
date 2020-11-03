@@ -28,7 +28,6 @@ class Substance(db.Model):
     casrn = index_property("identifiers", "casrn", default=None)
     preferred_name = index_property("identifiers", "preferred_name", default=None)
 
-    val = db.column('value', type_=JSONB)
 
 ix_identifiers = db.Index(
     "ix_identifiers",
