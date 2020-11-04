@@ -184,7 +184,10 @@ def test_resolve_substance(client, db, substance):
                 "identifier": "Butyric acid, 2-(5-nitro-alpha-iminofurfuryl)hydrazide",
                 "weight": 0.75,
             },
-            {"identifier": "N'-Butanoyl-5-nitrofuran-2-carbohydrazonamide", "weight": 0.5},
+            {
+                "identifier": "N'-Butanoyl-5-nitrofuran-2-carbohydrazonamide",
+                "weight": 0.5,
+            },
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
