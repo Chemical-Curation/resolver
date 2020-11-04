@@ -19,7 +19,7 @@ class SubstanceFactory(factory.Factory):
         '{ "preferred_name":"Moperone","display_name":"Moperone","casrn":"1050-79-9",'
         '"inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N", '
         '"casalts":[{"casalt":"0001050799","weight:0.5},{"casalt":"1050799","weight":0.5}],'
-        '"synonyms": [{"synonym": "Meperon","weight": 0.75},{"synonym": "Methylperidol","weight": 0.5}]}'
+        '"synonyms": [{"identifier": "Meperon","weight": 0.75},{"identifier": "Methylperidol","weight": 0.5}]}'
     )
 
     class Meta:

@@ -157,27 +157,28 @@ class SubstanceSearchResultList(ResourceList):
             search_term = request.args.get("identifier")
 
             # This allows reference to the aliased results from synonym select_from jsonb_array_elements
-            synonyms = db.column("synonyms", type_=JSONB)
-
-            query_ = (
-                self.session.query(Substance)
-                # Flatten synonyms in an additional jsonb object.
+            val = db.column("value", type_=JSONB)
+            # Construct synonym subquery.
+            synonym_subquery = (
+                self.session.query(Substance.id)
                 .select_from(
                     Substance,
-                    func.jsonb_array_elements(Substance.identifiers["synonyms"]).alias(
-                        "synonyms"
+                    func.jsonb_array_elements(Substance.identifiers["synonyms"]),
+                )
+                .filter(val["identifier"].astext.ilike(f"%{search_term}%"))
+                .subquery()
+            )
+
+            query_ = self.session.query(Substance).filter(
+                or_(
+                    Substance.identifiers["preferred_name"].astext.ilike(
+                        f"%{search_term}%"
                     ),
-                ).filter(
-                    or_(
-                        Substance.identifiers["preferred_name"].astext.ilike(
-                            f"%{search_term}%"
-                        ),
-                        Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
-                        Substance.identifiers["display_name"].astext.ilike(
-                            f"%{search_term}%"
-                        ),
-                        synonyms["identifier"].astext.ilike(f"%{search_term}%"),
-                    )
+                    Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
+                    Substance.identifiers["display_name"].astext.ilike(
+                        f"%{search_term}%"
+                    ),
+                    Substance.id.in_(synonym_subquery),
                 )
             )
         return query_
