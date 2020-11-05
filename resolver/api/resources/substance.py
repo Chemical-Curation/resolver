@@ -129,6 +129,120 @@ class SubstanceList(ResourceList):
     data_layer = {"session": db.session, "model": Substance}
 
 
+class SubstanceIndexResource(ResourceList):
+    """Create and Update an indexed substance
+
+    ---
+    patch:
+      tags:
+        - substance_index
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: substance
+                        id:
+                          type: string
+                          example: DTXSID1020000000
+                        attributes:
+                          type: object
+                          properties:
+                            identifier:
+                              type: object
+      responses:
+        201:
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: substance
+                          id:
+                            type: sid
+                            example: DTXSID1020000000
+                          attributes:
+                            type: object
+                            properties:
+                              identifier:
+                                type: object
+    delete:
+      tags:
+        - substance_index
+      responses:
+        200:
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      meta:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: Database successfully cleared. __rows__ rows deleted
+    """
+
+    schema = SubstanceSchema
+    data_layer = {"session": db.session, "model": Substance}
+    methods = ["POST", "DELETE"]
+
+    def create_object(self, data, kwargs):
+        """Creates or updates a model object
+
+        Note:
+            This is a limited extension of
+            `flask_rest_jsonapi/data_layers/alchemy.py`
+            to allow for merges.
+            This will not handle relationships as there is no foreseeable need.
+
+        Args:
+            :param dict data: the data validated by marshmallow
+            :param dict kwargs: kwargs from the resource view
+
+        Returns:
+            :return DeclarativeMeta: an object from sqlalchemy
+        """
+
+        obj = self._data_layer.model(**data)
+        self._data_layer.session.merge(obj)
+        self._data_layer.session.commit()
+        return obj
+
+    def delete(self):
+        """Delete an object"""
+        rows_deleted = self.delete_db()
+
+        result = {
+            "meta": {
+                "message": f"Substance Index successfully cleared. {rows_deleted} rows deleted"
+            }
+        }
+
+        return result
+
+    def delete_db(self):
+        rows_deleted = self._data_layer.model.query.delete()
+        self._data_layer.session.commit()
+
+        return rows_deleted
+
+
 class SubstanceSearchResultList(ResourceList):
     """
 
