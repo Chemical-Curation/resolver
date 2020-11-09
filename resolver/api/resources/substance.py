@@ -277,6 +277,8 @@ class SubstanceSearchResultList(ResourceList):
                         Substance.identifiers["preferred_name"].astext.contains(
                             search_term
                         ),
+                        Substance.identifiers["compound_id"].astext.ilike(search_term),
+                        Substance.id.ilike(search_term),
                         Substance.identifiers["casrn"].astext.contains(search_term),
                         Substance.identifiers["display_name"].astext.contains(
                             search_term
@@ -297,6 +299,8 @@ class SubstanceSearchResultList(ResourceList):
                         Substance.identifiers["preferred_name"].astext.ilike(
                             f"%{search_term}%"
                         ),
+                        Substance.identifiers["compound_id"].astext.ilike(search_term),
+                        Substance.id.ilike(search_term),
                         Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
                         Substance.identifiers["display_name"].astext.ilike(
                             f"%{search_term}%"
