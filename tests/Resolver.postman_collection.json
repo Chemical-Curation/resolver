@@ -6,6 +6,36 @@
 	},
 	"item": [
 		{
+			"name": "issue_248",
+			"item": [
+				{
+					"name": "substance synonym identifier",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseURL}}/resolver?identifier=Chem-5ical",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"resolver"
+							],
+							"query": [
+								{
+									"key": "identifier",
+									"value": "Chem-5ical"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "I want to be able to able to find a substance using a name or casrn that exists in the synonyms rather than the substance model",
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "GET Substances",
 			"request": {
 				"method": "GET",
