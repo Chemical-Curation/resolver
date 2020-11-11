@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ab9526aa-ab01-4a89-bc5d-3a3b285dcf85",
+		"_postman_id": "cb6a4105-3a38-4a92-8b5d-b686e714440a",
 		"name": "Resolver",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -28,7 +28,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{BaseURL}}/resolver?identifier=Moperone",
+					"raw": "{{BaseURL}}/resolver?identifier=ample",
 					"host": [
 						"{{BaseURL}}"
 					],
@@ -38,7 +38,7 @@
 					"query": [
 						{
 							"key": "identifier",
-							"value": "Moperone"
+							"value": "ample"
 						}
 					]
 				}
@@ -51,7 +51,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{BaseURL}}/resolver?identifier=Moperone",
+					"raw": "{{BaseURL}}/resolver?identifier=roxi",
 					"host": [
 						"{{BaseURL}}"
 					],
@@ -61,7 +61,7 @@
 					"query": [
 						{
 							"key": "identifier",
-							"value": "Moperone"
+							"value": "roxi"
 						}
 					]
 				}
@@ -271,7 +271,8 @@
 		{
 			"id": "b28b9cb9-42e0-42c3-8ba5-64af16467b37",
 			"key": "BaseURL",
-			"value": "http://localhost:5000/api/v1/"
+			"value": "http://localhost:5000/api/v1/",
+			"type": "string"
 		}
 	],
 	"protocolProfileBehavior": {}
