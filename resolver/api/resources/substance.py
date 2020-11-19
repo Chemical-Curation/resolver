@@ -1,10 +1,11 @@
 from flask import request
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import JSONB
+
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
 from resolver.models import Substance
 from resolver.extensions import db
 from sqlalchemy.sql.expression import or_
-from sqlalchemy.orm.exc import NoResultFound
-from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList
 
@@ -268,45 +269,34 @@ class SubstanceSearchResultList(ResourceList):
         query_ = self.session.query(Substance)
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
-            try:
-                # TODO: allow incorrectly spelled search terms
-                # https://github.com/Chemical-Curation/chemcurator_django/issues/208
-                # make sure the query returns something
-                Substance.query.filter(
-                    or_(
-                        Substance.identifiers["preferred_name"].astext.contains(
-                            search_term
-                        ),
-                        Substance.identifiers["compound_id"].astext.ilike(search_term),
-                        Substance.id.ilike(search_term),
-                        Substance.identifiers["casrn"].astext.contains(search_term),
-                        Substance.identifiers["display_name"].astext.contains(
-                            search_term
-                        ),
-                    )
-                ).first()
-            except NoResultFound:
-                # TODO: should this return a 200 code but with an empty [] array?
-                raise ObjectNotFound(
-                    {"parameter": "identifier"},
-                    "Identifer {} did not resolve to a substance".format(
-                        request.args["identifier"]
+
+            # This allows reference to the aliased results from synonym select_from jsonb_array_elements
+            val = db.column("value", type_=JSONB)
+            # Construct synonym subquery.
+            synonym_subquery = (
+                self.session.query(Substance.id)
+                .select_from(
+                    Substance,
+                    func.jsonb_array_elements(Substance.identifiers["synonyms"]),
+                )
+                .filter(val["identifier"].astext.ilike(f"%{search_term}%"))
+                .subquery()
+            )
+
+            query_ = self.session.query(Substance).filter(
+                or_(
+                    Substance.identifiers["preferred_name"].astext.ilike(
+                        f"%{search_term}%"
                     ),
+                    Substance.identifiers["compound_id"].astext.ilike(search_term),
+                    Substance.id.ilike(search_term),
+                    Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
+                    Substance.identifiers["display_name"].astext.ilike(
+                        f"%{search_term}%"
+                    ),
+                    Substance.id.in_(synonym_subquery),
                 )
-            else:
-                query_ = self.session.query(Substance).filter(
-                    or_(
-                        Substance.identifiers["preferred_name"].astext.ilike(
-                            f"%{search_term}%"
-                        ),
-                        Substance.identifiers["compound_id"].astext.ilike(search_term),
-                        Substance.id.ilike(search_term),
-                        Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
-                        Substance.identifiers["display_name"].astext.ilike(
-                            f"%{search_term}%"
-                        ),
-                    )
-                )
+            )
         return query_
 
     def after_get_collection(self, collection, qs, view_kwargs):
