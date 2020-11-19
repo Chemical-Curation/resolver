@@ -179,6 +179,7 @@ def test_resolve_substance(client, db, substance):
         "display_name": "Butyric acid Original Dressing",
         "casrn": "3757-31-1",
         "inchikey": "UUTBLVFYDQGDNV-UHFFFAOYSA-N",
+        "compound_id": "DTXCID302000003",
         "casalts": [
             {"casalt": "3757-31-1", "weight": 0.5},
         ],
@@ -233,6 +234,22 @@ def test_resolve_substance(client, db, substance):
     # test display name match
     synonym = "Meperon"
     search_url = url_for("resolved_substance_list", identifier=synonym)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+
+    # test CID match
+    cid = "DTXCID302000003"
+    search_url = url_for("resolved_substance_list", identifier=cid)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+
+    # test SID match
+    sid = "DTXSID60191004"
+    search_url = url_for("resolved_substance_list", identifier=sid)
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
