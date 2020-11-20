@@ -1,6 +1,7 @@
 from flask import request
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import with_expression
 
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
 from resolver.models import Substance
@@ -283,18 +284,27 @@ class SubstanceSearchResultList(ResourceList):
                 .subquery()
             )
 
-            query_ = self.session.query(Substance).filter(
-                or_(
-                    Substance.identifiers["preferred_name"].astext.ilike(
-                        f"%{search_term}%"
-                    ),
-                    Substance.identifiers["compound_id"].astext.ilike(search_term),
-                    Substance.id.ilike(search_term),
-                    Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
-                    Substance.identifiers["display_name"].astext.ilike(
-                        f"%{search_term}%"
-                    ),
-                    Substance.id.in_(synonym_subquery),
+            query_ = (
+                self.session.query(Substance)
+                .filter(
+                    or_(
+                        Substance.identifiers["preferred_name"].astext.ilike(
+                            f"%{search_term}%"
+                        ),
+                        Substance.identifiers["compound_id"].astext.ilike(search_term),
+                        Substance.id.ilike(search_term),
+                        Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
+                        Substance.identifiers["display_name"].astext.ilike(
+                            f"%{search_term}%"
+                        ),
+                        Substance.id.in_(synonym_subquery),
+                    )
+                )
+                .populate_existing()
+                .options(
+                    with_expression(
+                        Substance.search_score, Substance.id.ilike(search_term)
+                    )
                 )
             )
         return query_
@@ -303,10 +313,13 @@ class SubstanceSearchResultList(ResourceList):
         """
         TODO: Scoring the members of the collection could happen here
         See https://github.com/Chemical-Curation/chemcurator_django/issues/144
-        This method could also populate the `matches` field in the serialized
-        SubstanceSearchResultSchema
+        Each member of the collection is a `sqlalchemy.orm.state.InstanceState` object
         """
-        pass
+        print("--- after_get_collection ---")
+        print(request.args)
+        for item in collection:
+            print(item.__dict__)
+        return collection
 
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
@@ -316,6 +329,6 @@ class SubstanceSearchResultList(ResourceList):
         "model": Substance,
         "methods": {
             "query": query,
-            # "after_get_collection": after_get_collection,
+            "after_get_collection": after_get_collection,
         },
     }
