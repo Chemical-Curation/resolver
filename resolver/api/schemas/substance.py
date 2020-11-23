@@ -28,11 +28,10 @@ class SubstanceSearchResultSchema(Schema):
     orm_score = fields.Raw(dump_only=True)
 
     def score_matches(self, substance, **view_kwargs):
-
+        matches = {}  # a dictionary of matched fields and scores
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
             id_dict = substance.identifiers
-            matches = {}  # a dictionary of matched fields and scores
             # start comparing identifiers
             if id_dict["preferred_name"]:
                 if re.search(search_term, id_dict["preferred_name"]):
@@ -43,6 +42,11 @@ class SubstanceSearchResultSchema(Schema):
             if id_dict["casrn"]:
                 if re.search(search_term, id_dict["casrn"]):
                     matches["casrn"] = 1
+            if id_dict["synonyms"]:
+                matches["synonyms"] = {}
+                for synonym in id_dict["synonyms"]:
+                    if re.search(search_term, synonym["identifier"]):
+                        matches["synonyms"][synonym["identifier"]] = synonym["weight"]
 
         return matches
 

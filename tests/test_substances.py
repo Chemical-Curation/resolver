@@ -63,7 +63,6 @@ def test_patch_substance(client, db, substance):
         substance_url, json=data, headers={"content-type": "application/vnd.api+json"}
     )
     assert rep.status_code == 200
-    print(rep.get_json())
     substance_idents = rep.get_json()["data"]["attributes"]["identifiers"]
     assert substance_idents == new_idents
 
@@ -214,6 +213,8 @@ def test_resolve_substance(client, db, substance):
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
+    assert results["data"][0]["attributes"]["matches"]["preferred_name"] == 1
+    assert results["data"][0]["attributes"]["matches"]["display_name"] == 1
 
     # test CASRN match
     casrn = "1050-79-9"
@@ -222,6 +223,7 @@ def test_resolve_substance(client, db, substance):
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
+    assert results["data"][0]["attributes"]["matches"]["casrn"] == 1
 
     # test display name match
     display_name = "Kraft Miracle Whip Original Dressing"
@@ -230,14 +232,16 @@ def test_resolve_substance(client, db, substance):
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
+    assert results["data"][0]["attributes"]["matches"]["display_name"] == 1
 
-    # test display name match
+    # test synonym match
     synonym = "Meperon"
     search_url = url_for("resolved_substance_list", identifier=synonym)
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
+    assert results["data"][0]["attributes"]["matches"]["synonyms"] == {"Meperon": 0.75}
 
     # test CID match
     cid = "DTXCID302000003"
@@ -320,4 +324,3 @@ def test_substance_index_delete(client, db, substance_factory):
     assert resp.status_code == 200
     assert "Substance Index successfully cleared" in results["meta"]["message"]
     assert Substance.query.count() == 0
-

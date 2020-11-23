@@ -284,47 +284,21 @@ class SubstanceSearchResultList(ResourceList):
                 .subquery()
             )
 
-            query_ = (
-                self.session.query(Substance)
-                .filter(
-                    or_(
-                        Substance.identifiers["preferred_name"].astext.ilike(
-                            f"%{search_term}%"
-                        ),
-                        Substance.identifiers["compound_id"].astext.ilike(search_term),
-                        Substance.id.ilike(search_term),
-                        Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
-                        Substance.identifiers["display_name"].astext.ilike(
-                            f"%{search_term}%"
-                        ),
-                        Substance.id.in_(synonym_subquery),
-                    )
-                )
-                .populate_existing()
-                .options(
-                    with_expression(
-                        # first argument is the name of an empty query_expression() defined on the model
-                        Substance.orm_score,
-                        # the actual expression for scoring the resolved results
-                        Substance.identifiers["display_name"].astext.ilike(
-                            f"%{search_term}%"
-                        ),
-                    )
+            query_ = self.session.query(Substance).filter(
+                or_(
+                    Substance.identifiers["preferred_name"].astext.ilike(
+                        f"%{search_term}%"
+                    ),
+                    Substance.identifiers["compound_id"].astext.ilike(search_term),
+                    Substance.id.ilike(search_term),
+                    Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
+                    Substance.identifiers["display_name"].astext.ilike(
+                        f"%{search_term}%"
+                    ),
+                    Substance.id.in_(synonym_subquery),
                 )
             )
         return query_
-
-    def after_get_collection(self, collection, qs, view_kwargs):
-        """
-        TODO: Scoring the members of the collection could happen here
-        See https://github.com/Chemical-Curation/chemcurator_django/issues/144
-        Each member of the collection is a `sqlalchemy.orm.state.InstanceState` object
-        """
-        print("--- after_get_collection ---")
-        print(request.args)
-        for item in collection:
-            print(item.__dict__)
-        return collection
 
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
@@ -334,6 +308,5 @@ class SubstanceSearchResultList(ResourceList):
         "model": Substance,
         "methods": {
             "query": query,
-            "after_get_collection": after_get_collection,
         },
     }
