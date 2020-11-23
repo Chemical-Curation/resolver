@@ -303,7 +303,12 @@ class SubstanceSearchResultList(ResourceList):
                 .populate_existing()
                 .options(
                     with_expression(
-                        Substance.search_score, Substance.id.ilike(search_term)
+                        # first argument is the name of an empty query_expression() defined on the model
+                        Substance.orm_score,
+                        # the actual expression for scoring the resolved results
+                        Substance.identifiers["display_name"].astext.ilike(
+                            f"%{search_term}%"
+                        ),
                     )
                 )
             )

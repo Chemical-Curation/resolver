@@ -28,7 +28,7 @@ class Substance(db.Model):
 
     casrn = index_property("identifiers", "casrn", default=None)
     preferred_name = index_property("identifiers", "preferred_name", default=None)
-    search_score = query_expression()
+    orm_score = query_expression()
 
 
 ix_identifiers = db.Index(

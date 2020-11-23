@@ -1,8 +1,10 @@
+import re
 from resolver.models import Substance
 from resolver.extensions import db
 from marshmallow_jsonapi.schema import Schema
 from marshmallow_jsonapi import fields
 from marshmallow import pre_dump
+from flask import request
 
 
 class SubstanceSchema(Schema):
@@ -23,21 +25,26 @@ class SubstanceSearchResultSchema(Schema):
     identifiers = fields.Raw(required=True)
     # the matches will be the fields in which the identifier was found
     matches = fields.Method("score_matches", dump_only=True)
-    # the score will be calculated in the resolver
-    # https://github.com/Chemical-Curation/chemcurator_django/issues/144
-    search_score = fields.Raw(dump_only=True)
-
-    @pre_dump(pass_many=True)
-    def attach_search_term(self, data, **_):
-        print("--- pre_dump method attach_search_term ---")
-        for r in data:
-            print(r.__dict__)
-        return data
+    orm_score = fields.Raw(dump_only=True)
 
     def score_matches(self, substance, **view_kwargs):
-        idfield = "fieldname"
-        idscore = 0.90
-        return "{}, {}".format(idfield, idscore)
+
+        if request.args.get("identifier") is not None:
+            search_term = request.args.get("identifier")
+            id_dict = substance.identifiers
+            matches = {}  # a dictionary of matched fields and scores
+            # start comparing identifiers
+            if id_dict["preferred_name"]:
+                if re.search(search_term, id_dict["preferred_name"]):
+                    matches["preferred_name"] = 1
+            if id_dict["display_name"]:
+                if re.search(search_term, id_dict["display_name"]):
+                    matches["display_name"] = 1
+            if id_dict["casrn"]:
+                if re.search(search_term, id_dict["casrn"]):
+                    matches["casrn"] = 1
+
+        return matches
 
     class Meta:
         type_ = "substance_search_results"
