@@ -213,11 +213,15 @@ def test_resolve_substance(client, db, substance):
                 "weight": 0.5,
                 "synonymtype": "Generic Name",
             },
-            {"identifier": "Miracle Whip", "weight": 0.2},
+            {
+                "identifier": "Miracle Whip",
+                "weight": 0.2,
+                "synonymtype": "Generic Name",
+            },
             {
                 "identifier": "3757-31-1",
                 "weight": 0.2,
-                "synonymtype": "Alternate CAS_RN",
+                "synonymtype": "Alternate CAS-RN",
             },
         ],
     }
@@ -226,6 +230,8 @@ def test_resolve_substance(client, db, substance):
     rep = client.post(
         substances_url, json=data, headers={"content-type": "application/vnd.api+json"}
     )
+    # confirm the data posted
+    assert db.session.query(Substance).count() == 2
 
     # test non-resolving identifier
     search_url = url_for("resolved_substance_list", identifier="Foobar")
@@ -233,17 +239,6 @@ def test_resolve_substance(client, db, substance):
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["data"] == []
-
-    # test preferred name match
-    preferred_name = "Miracle Whip"
-    search_url = url_for("resolved_substance_list", identifier=preferred_name)
-    rep = client.get(search_url)
-    assert rep.status_code == 200
-    results = rep.get_json()
-    assert results["meta"] == {"count": 2}
-    assert (
-        results["data"][0]["attributes"]["searchscore"]["Matched preferred_name"] == 1
-    )
 
     # test CASRN match
     casrn = "1050-79-9"
@@ -274,6 +269,17 @@ def test_resolve_substance(client, db, substance):
         results["data"][0]["attributes"]["searchscore"]["Matched Generic Name"] == 0.75
     )
 
+    # test preferred name match
+    preferred_name = "Miracle Whip"
+    search_url = url_for("resolved_substance_list", identifier=preferred_name)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 2}
+    assert (
+        results["data"][0]["attributes"]["searchscore"]["Matched preferred_name"] == 1
+    )
+
     # test preferred_name versus synonym match
     synonym = "Miracle Whip"
     search_url = url_for("resolved_substance_list", identifier=synonym)
@@ -288,8 +294,7 @@ def test_resolve_substance(client, db, substance):
         results["data"][0]["attributes"]["searchscore"]["Matched preferred_name"] == 1
     )
     assert (
-        results["data"][1]["attributes"]["searchscore"]["Matched synonym Miracle Whip"]
-        == 0.2
+        results["data"][1]["attributes"]["searchscore"]["Matched Generic Name"] == 0.2
     )
 
     # test CID match
