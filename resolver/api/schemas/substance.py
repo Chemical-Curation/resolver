@@ -3,7 +3,6 @@ from resolver.models import Substance
 from resolver.extensions import db
 from marshmallow_jsonapi.schema import Schema
 from marshmallow_jsonapi import fields
-from marshmallow import pre_dump
 from flask import request
 
 
@@ -23,35 +22,48 @@ class SubstanceSearchResultSchema(Schema):
 
     id = fields.Str(required=True)
     identifiers = fields.Raw(required=True)
-    # the matches will be the fields in which the identifier was found
-    matches = fields.Method("score_matches", dump_only=True)
-    orm_score = fields.Raw(dump_only=True)
 
-    def score_matches(self, substance, **view_kwargs):
+    # the net score is the highest of all the match scores,
+    # with some tiebreaking logic TBD
+    searchscore = fields.Method("rollup_matches", dump_only=True)
+
+    def rollup_matches(self, substance, **view_kwargs):
         matches = {}  # a dictionary of matched fields and scores
+        match_summary = {}
+
         if request.args.get("identifier") is not None:
-            search_term = request.args.get("identifier")
+            # append regex characters to force full-string matching for now
+            search_term = f"^{request.args.get('identifier')}$"
+
             id_dict = substance.identifiers
             # start comparing identifiers
             if id_dict["preferred_name"]:
                 if re.search(search_term, id_dict["preferred_name"]):
-                    matches["preferred_name"] = 1
+                    matches["Matched preferred_name"] = 1
             if id_dict["display_name"]:
                 if re.search(search_term, id_dict["display_name"]):
-                    matches["display_name"] = 1
+                    matches["Matched display_name"] = 1
             if id_dict["casrn"]:
                 if re.search(search_term, id_dict["casrn"]):
-                    matches["casrn"] = 1
+                    matches["Matched casrn"] = 1
+
             if id_dict["synonyms"]:
-                matches["synonyms"] = {}
                 for synonym in id_dict["synonyms"]:
                     if re.search(search_term, synonym["identifier"]):
-                        matches["synonyms"][synonym["identifier"]] = synonym["weight"]
+                        matches[f'Matched synonym {synonym["identifier"]}'] = synonym[
+                            "weight"
+                        ]
 
-        return matches
+            if bool(matches):
+                max_key = max(matches, key=matches.get)
+                max_score = matches[max_key]
+                match_summary = {max_key: max_score}
+
+        return match_summary if bool(match_summary) else None
 
     class Meta:
         type_ = "substance_search_results"
         model = Substance
         sqla_session = db.session
         load_instance = True
+        ordered = True

@@ -161,6 +161,7 @@ def test_resolve_substance(client, db, substance):
         "synonyms": [
             {"identifier": "Meperon", "weight": 0.75},
             {"identifier": "Methylperidol", "weight": 0.5},
+            {"identifier": "Ambiguous synonym", "weight": 0.2},
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
@@ -191,6 +192,7 @@ def test_resolve_substance(client, db, substance):
                 "identifier": "N'-Butanoyl-5-nitrofuran-2-carbohydrazonamide",
                 "weight": 0.5,
             },
+            {"identifier": "Miracle Whip", "weight": 0.2},
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
@@ -212,9 +214,10 @@ def test_resolve_substance(client, db, substance):
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
-    assert results["meta"] == {"count": 1}
-    assert results["data"][0]["attributes"]["matches"]["preferred_name"] == 1
-    assert results["data"][0]["attributes"]["matches"]["display_name"] == 1
+    assert results["meta"] == {"count": 2}
+    assert (
+        results["data"][0]["attributes"]["searchscore"]["Matched preferred_name"] == 1
+    )
 
     # test CASRN match
     casrn = "1050-79-9"
@@ -223,7 +226,7 @@ def test_resolve_substance(client, db, substance):
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
-    assert results["data"][0]["attributes"]["matches"]["casrn"] == 1
+    assert results["data"][0]["attributes"]["searchscore"]["Matched casrn"] == 1
 
     # test display name match
     display_name = "Kraft Miracle Whip Original Dressing"
@@ -232,16 +235,37 @@ def test_resolve_substance(client, db, substance):
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
-    assert results["data"][0]["attributes"]["matches"]["display_name"] == 1
+    assert results["data"][0]["attributes"]["searchscore"]["Matched display_name"] == 1
 
-    # test synonym match
+    # test single synonym match
     synonym = "Meperon"
     search_url = url_for("resolved_substance_list", identifier=synonym)
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
-    assert results["data"][0]["attributes"]["matches"]["synonyms"] == {"Meperon": 0.75}
+    assert (
+        results["data"][0]["attributes"]["searchscore"]["Matched synonym Meperon"]
+        == 0.75
+    )
+
+    # test preferred_name versus synonym match
+    synonym = "Miracle Whip"
+    search_url = url_for("resolved_substance_list", identifier=synonym)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 2}
+    # [print(x["attributes"]["searchscore"]) for x in results["data"]]
+    # The preferred name should sort before the synonym - this test
+    # passes even when the DTXSIDs sort in the opposite order.
+    assert (
+        results["data"][0]["attributes"]["searchscore"]["Matched preferred_name"] == 1
+    )
+    assert (
+        results["data"][1]["attributes"]["searchscore"]["Matched synonym Miracle Whip"]
+        == 0.2
+    )
 
     # test CID match
     cid = "DTXCID302000003"
@@ -265,7 +289,8 @@ def test_resolve_substance(client, db, substance):
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
-    assert results["meta"] == {"count": 1}
+    # the partial name also matches a synonym
+    assert results["meta"] == {"count": 2}
 
     # test case insensitivity
     partial_name = "miracle"
@@ -273,7 +298,7 @@ def test_resolve_substance(client, db, substance):
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
-    assert results["meta"] == {"count": 1}
+    assert results["meta"] == {"count": 2}
 
     # test multiple matches
     partial_name = "Original Dressing"
