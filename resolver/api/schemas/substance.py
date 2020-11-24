@@ -50,9 +50,7 @@ class SubstanceSearchResultSchema(Schema):
             if id_dict["synonyms"]:
                 for synonym in id_dict["synonyms"]:
                     if re.search(search_term, synonym["identifier"]):
-                        matches[f'Matched synonym {synonym["identifier"]}'] = synonym[
-                            "weight"
-                        ]
+                        matches[f'Matched {synonym["synonymtype"]}'] = synonym["weight"]
 
             if bool(matches):
                 max_key = max(matches, key=matches.get)

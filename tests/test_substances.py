@@ -45,13 +45,19 @@ def test_patch_substance(client, db, substance):
         "preferred_name": "Moperone Updated",
         "casrn": "1050-79-9",
         "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
-        "casalts": [
-            {"casalt": "0001050799", "weight": 0.5},
-            {"casalt": "1050799", "weight": 0.5},
-        ],
         "synonyms": [
-            {"identifier": "Meperon", "weight": 0.75},
-            {"identifier": "Methylperidol", "weight": 0.5},
+            {"identifier": "Meperon", "weight": 0.75, "synonymtype": "Generic Name"},
+            {
+                "identifier": "Methylperidol",
+                "weight": 0.5,
+                "synonymtype": "Generic Name",
+            },
+            {
+                "identifier": "0001050799",
+                "weight": 0.5,
+                "synonymtype": "Alternate CAS-RN",
+            },
+            {"identifier": "1050799", "weight": 0.5, "synonymtype": "Alternate CAS-RN"},
         ],
     }
     data["data"]["id"] = substance.id
@@ -100,13 +106,15 @@ def test_create_substance(client, db):
         "display_name": "Miracle Whip",
         "casrn": "1050-79-9",
         "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
-        "casalts": [
-            {"casalt": "0001050799", "weight": 0.5},
-            {"casalt": "1050799", "weight": 0.5},
-        ],
         "synonyms": [
-            {"identifier": "Meperon", "weight": 0.75},
-            {"identifier": "Methylperidol", "weight": 0.5},
+            {"identifier": "Meperon", "weight": 0.75, "synonymtype": "Generic Name"},
+            {
+                "identifier": "Methylperidol",
+                "weight": 0.5,
+                "synonymtype": "Generic Name",
+            },
+            {"identifier": "0001050799", "weight": 0.5, "synonymtype": "Generic Name"},
+            {"identifier": "1050799", "weight": 0.5, "synonymtype": "Generic Name"},
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
@@ -154,14 +162,28 @@ def test_resolve_substance(client, db, substance):
         "display_name": "Kraft Miracle Whip Original Dressing",
         "casrn": "1050-79-9",
         "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
-        "casalts": [
-            {"casalt": "0001050799", "weight": 0.5},
-            {"casalt": "1050799", "weight": 0.5},
-        ],
         "synonyms": [
-            {"identifier": "Meperon", "weight": 0.75},
-            {"identifier": "Methylperidol", "weight": 0.5},
-            {"identifier": "Ambiguous synonym", "weight": 0.2},
+            {"identifier": "Meperon", "weight": 0.75, "synonymtype": "Generic Name"},
+            {
+                "identifier": "Methylperidol",
+                "weight": 0.5,
+                "synonymtype": "Generic Name",
+            },
+            {
+                "identifier": "Ambiguous synonym",
+                "weight": 0.2,
+                "synonymtype": "Generic Name",
+            },
+            {
+                "identifier": "0001050799",
+                "weight": 0.8,
+                "synonymtype": "Alternate CAS-RN",
+            },
+            {
+                "identifier": "1050799",
+                "weight": 0.8,
+                "synonymtype": "Alternate CAS-RN",
+            },
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
@@ -180,19 +202,23 @@ def test_resolve_substance(client, db, substance):
         "casrn": "3757-31-1",
         "inchikey": "UUTBLVFYDQGDNV-UHFFFAOYSA-N",
         "compound_id": "DTXCID302000003",
-        "casalts": [
-            {"casalt": "3757-31-1", "weight": 0.5},
-        ],
         "synonyms": [
             {
                 "identifier": "Butyric acid, 2-(5-nitro-alpha-iminofurfuryl)hydrazide",
                 "weight": 0.75,
+                "synonymtype": "Generic Name",
             },
             {
                 "identifier": "N'-Butanoyl-5-nitrofuran-2-carbohydrazonamide",
                 "weight": 0.5,
+                "synonymtype": "Generic Name",
             },
             {"identifier": "Miracle Whip", "weight": 0.2},
+            {
+                "identifier": "3757-31-1",
+                "weight": 0.2,
+                "synonymtype": "Alternate CAS_RN",
+            },
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
@@ -245,8 +271,7 @@ def test_resolve_substance(client, db, substance):
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
     assert (
-        results["data"][0]["attributes"]["searchscore"]["Matched synonym Meperon"]
-        == 0.75
+        results["data"][0]["attributes"]["searchscore"]["Matched Generic Name"] == 0.75
     )
 
     # test preferred_name versus synonym match
