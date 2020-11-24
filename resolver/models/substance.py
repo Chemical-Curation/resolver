@@ -3,8 +3,7 @@ from resolver.extensions import db
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy import text
-from sqlalchemy.sql import func, literal
-from sqlalchemy.orm import query_expression
+from sqlalchemy.sql import func
 
 
 class Substance(db.Model):
@@ -28,7 +27,6 @@ class Substance(db.Model):
 
     casrn = index_property("identifiers", "casrn", default=None)
     preferred_name = index_property("identifiers", "preferred_name", default=None)
-    orm_score = query_expression()
 
 
 ix_identifiers = db.Index(
