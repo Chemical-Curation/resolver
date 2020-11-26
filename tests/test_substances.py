@@ -50,8 +50,8 @@ def test_patch_substance(client, db, substance):
             {"casalt": "1050799", "weight": 0.5},
         ],
         "synonyms": [
-            {"synonym": "Meperon", "weight": 0.75},
-            {"synonym": "Methylperidol", "weight": 0.5},
+            {"identifier": "Meperon", "weight": 0.75},
+            {"identifier": "Methylperidol", "weight": 0.5},
         ],
     }
     data["data"]["id"] = substance.id
@@ -106,8 +106,8 @@ def test_create_substance(client, db):
             {"casalt": "1050799", "weight": 0.5},
         ],
         "synonyms": [
-            {"synonym": "Meperon", "weight": 0.75},
-            {"synonym": "Methylperidol", "weight": 0.5},
+            {"identifier": "Meperon", "weight": 0.75},
+            {"identifier": "Methylperidol", "weight": 0.5},
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
@@ -160,8 +160,8 @@ def test_resolve_substance(client, db, substance):
             {"casalt": "1050799", "weight": 0.5},
         ],
         "synonyms": [
-            {"synonym": "Meperon", "weight": 0.75},
-            {"synonym": "Methylperidol", "weight": 0.5},
+            {"identifier": "Meperon", "weight": 0.75},
+            {"identifier": "Methylperidol", "weight": 0.5},
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
@@ -179,15 +179,19 @@ def test_resolve_substance(client, db, substance):
         "display_name": "Butyric acid Original Dressing",
         "casrn": "3757-31-1",
         "inchikey": "UUTBLVFYDQGDNV-UHFFFAOYSA-N",
+        "compound_id": "DTXCID302000003",
         "casalts": [
             {"casalt": "3757-31-1", "weight": 0.5},
         ],
         "synonyms": [
             {
-                "synonym": "Butyric acid, 2-(5-nitro-alpha-iminofurfuryl)hydrazide",
+                "identifier": "Butyric acid, 2-(5-nitro-alpha-iminofurfuryl)hydrazide",
                 "weight": 0.75,
             },
-            {"synonym": "N'-Butanoyl-5-nitrofuran-2-carbohydrazonamide", "weight": 0.5},
+            {
+                "identifier": "N'-Butanoyl-5-nitrofuran-2-carbohydrazonamide",
+                "weight": 0.5,
+            },
         ],
     }
     data["data"]["attributes"]["identifiers"] = idents
@@ -224,6 +228,32 @@ def test_resolve_substance(client, db, substance):
     search_url = url_for("resolved_substance_list", identifier=display_name)
     rep = client.get(search_url)
     assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+
+    # test display name match
+    synonym = "Meperon"
+    search_url = url_for("resolved_substance_list", identifier=synonym)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+
+    # test CID match
+    cid = "DTXCID302000003"
+    search_url = url_for("resolved_substance_list", identifier=cid)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+
+    # test SID match
+    sid = "DTXSID60191004"
+    search_url = url_for("resolved_substance_list", identifier=sid)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
 
     # test name containment
     partial_name = "Miracle"
