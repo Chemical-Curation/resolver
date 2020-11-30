@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy import text
 from sqlalchemy.sql import func
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 
 
 class Substance(db.Model):
@@ -27,6 +28,15 @@ class Substance(db.Model):
 
     casrn = index_property("identifiers", "casrn", default=None)
     preferred_name = index_property("identifiers", "preferred_name", default=None)
+
+    @hybrid_method
+    def score_result(self, searchterm=None):
+        if bool(searchterm):
+            # search the identifiers for the term and score them
+            print(f"Scoring {searchterm} against {self.identifiers}")
+            return 0.99
+        else:
+            return None
 
 
 ix_identifiers = db.Index(

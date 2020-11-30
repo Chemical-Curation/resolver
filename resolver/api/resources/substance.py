@@ -306,7 +306,12 @@ class SubstanceSearchResultList(ResourceList):
         This method could also populate the `matches` field in the serialized
         SubstanceSearchResultSchema
         """
-        pass
+        print("after_get_collection")
+        if request.args.get("identifier") is not None:
+            search_term = request.args.get("identifier")
+        # sort the returned records by the value returned by Substance.score_result
+        collection.sort(key=lambda x: x.score_result(search_term), reverse=True)
+        return collection
 
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
@@ -316,6 +321,6 @@ class SubstanceSearchResultList(ResourceList):
         "model": Substance,
         "methods": {
             "query": query,
-            # "after_get_collection": after_get_collection,
+            "after_get_collection": after_get_collection,
         },
     }
