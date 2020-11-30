@@ -2,6 +2,7 @@ from resolver.models import Substance
 from resolver.extensions import db
 from marshmallow_jsonapi.schema import Schema
 from marshmallow_jsonapi import fields
+from flask import request
 
 
 class SubstanceSchema(Schema):
@@ -14,6 +15,7 @@ class SubstanceSchema(Schema):
         self_view = "substance_detail"
         self_view_kwargs = {"id": "<id>"}
         self_view_many = "substance_list"
+        self_url_kwargs = {"identifier": "<identifier>"}
 
 
 class SubstanceSearchResultSchema(Schema):
@@ -24,14 +26,11 @@ class SubstanceSearchResultSchema(Schema):
     matches = fields.Function(
         lambda obj: "[{}, {}]".format("matching field 1", "matching field 2")
     )
-    # the score will be calculated in the resolver
-    # https://github.com/Chemical-Curation/chemcurator_django/issues/144
-    score = fields.Function(lambda obj: 1)
+    score = fields.Function(lambda obj: obj.score_result("foo"))
 
     class Meta:
         type_ = "substance_search_results"
         self_view_many = "resolved_substance_list"
-        self_view_kwargs = {"identifier": "<identifier>"}
         model = Substance
         sqla_session = db.session
         load_instance = True

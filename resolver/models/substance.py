@@ -33,8 +33,25 @@ class Substance(db.Model):
     def score_result(self, searchterm=None):
         if bool(searchterm):
             # search the identifiers for the term and score them
-            print(f"Scoring {searchterm} against {self.identifiers}")
-            return 0.99
+            # print(f"Scoring {searchterm} against {self.identifiers}")
+            print(f"Scoring {searchterm} ")
+            matchlist = {}
+            for id_name in self.identifiers.keys():
+                if self.identifiers[id_name] == searchterm:
+                    matchlist[id_name] = 1
+            if self.identifiers["synonyms"]:
+                synonyms = self.identifiers["synonyms"]
+                for synonym in synonyms:
+                    synid = synonym["identifier"] if synonym["identifier"] else ""
+                    if synid == searchterm:
+                        matchlist[synonym["synonymtype"]] = synonym["weight"]
+
+            print(matchlist)
+            if matchlist:
+                score = 1.0
+            else:
+                score = 0
+            return score
         else:
             return None
 

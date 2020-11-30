@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
 from resolver.models import Substance
 from resolver.extensions import db
-from sqlalchemy.sql.expression import or_
+from sqlalchemy.sql.expression import or_  # , literal_column
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList
 
@@ -266,6 +266,7 @@ class SubstanceSearchResultList(ResourceList):
     """
 
     def query(self, view_kwargs):
+        print(view_kwargs)
         query_ = self.session.query(Substance)
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
@@ -283,7 +284,13 @@ class SubstanceSearchResultList(ResourceList):
                 .subquery()
             )
 
-            query_ = self.session.query(Substance).filter(
+            query_ = self.session.query(
+                Substance,
+                # try stashing the search term in the query at the row level for the benefit
+                # of the Schema deserializer
+                # literal_column(f"'{search_term}'")
+                # .label("search_term")
+            ).filter(
                 or_(
                     Substance.identifiers["preferred_name"].astext.ilike(
                         f"%{search_term}%"
@@ -300,17 +307,21 @@ class SubstanceSearchResultList(ResourceList):
         return query_
 
     def after_get_collection(self, collection, qs, view_kwargs):
-        """
-        TODO: Scoring the members of the collection could happen here
-        See https://github.com/Chemical-Curation/chemcurator_django/issues/144
-        This method could also populate the `matches` field in the serialized
-        SubstanceSearchResultSchema
-        """
-        print("after_get_collection")
+        """"""
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
+            collection.sort(key=lambda x: x.score_result(search_term), reverse=True)
+
+        print("after_get_collection")
+        print(qs.__dict__)
+        for r in collection:
+            print(r)
         # sort the returned records by the value returned by Substance.score_result
-        collection.sort(key=lambda x: x.score_result(search_term), reverse=True)
+        # It is not possible to apply the score_Result hybrid method at the class level,
+        # so we cannot just append
+        #    .order_by(Substance.score_result(search_term).desc())
+        # to the query. The score_result method only works at the row/instance level
+
         return collection
 
     methods = ["GET"]
