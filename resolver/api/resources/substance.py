@@ -307,20 +307,15 @@ class SubstanceSearchResultList(ResourceList):
         return query_
 
     def after_get_collection(self, collection, qs, view_kwargs):
-        """"""
+        """
+        Sorts the returned records by the value returned by Substance.score_result
+        It is not possible to apply the score_result hybrid method at the class level,
+        so we cannot just append `.order_by(Substance.score_result(search_term).desc())`
+        to the query. The score_result method only works at the row/instance level
+        """
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
             collection.sort(key=lambda x: x.score_result(search_term), reverse=True)
-
-        print("after_get_collection")
-        print(qs.__dict__)
-        for r in collection:
-            print(r)
-        # sort the returned records by the value returned by Substance.score_result
-        # It is not possible to apply the score_Result hybrid method at the class level,
-        # so we cannot just append
-        #    .order_by(Substance.score_result(search_term).desc())
-        # to the query. The score_result method only works at the row/instance level
 
         return collection
 

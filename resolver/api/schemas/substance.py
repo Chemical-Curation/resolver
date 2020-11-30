@@ -15,7 +15,6 @@ class SubstanceSchema(Schema):
         self_view = "substance_detail"
         self_view_kwargs = {"id": "<id>"}
         self_view_many = "substance_list"
-        self_url_kwargs = {"identifier": "<identifier>"}
 
 
 class SubstanceSearchResultSchema(Schema):
@@ -24,9 +23,11 @@ class SubstanceSearchResultSchema(Schema):
     identifiers = fields.Raw(required=True)
     # the matches will be the fields in which the identifier was found
     matches = fields.Function(
-        lambda obj: "[{}, {}]".format("matching field 1", "matching field 2")
+        lambda obj: obj.get_matches(request.args.get("identifier"))
     )
-    score = fields.Function(lambda obj: obj.score_result("foo"))
+    score = fields.Function(
+        lambda obj: obj.score_result(request.args.get("identifier"))
+    )
 
     class Meta:
         type_ = "substance_search_results"

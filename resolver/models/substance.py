@@ -30,30 +30,39 @@ class Substance(db.Model):
     preferred_name = index_property("identifiers", "preferred_name", default=None)
 
     @hybrid_method
-    def score_result(self, searchterm=None):
+    def get_matches(self, searchterm=None):
         if bool(searchterm):
             # search the identifiers for the term and score them
-            # print(f"Scoring {searchterm} against {self.identifiers}")
-            print(f"Scoring {searchterm} ")
             matchlist = {}
-            for id_name in self.identifiers.keys():
+            for id_name in ["casrn", "preferred_name", "display_name","compound_id"]:
+                # an exact match against a top-level identifier
+                # yields a 1.0 score
                 if self.identifiers[id_name] == searchterm:
                     matchlist[id_name] = 1
             if self.identifiers["synonyms"]:
                 synonyms = self.identifiers["synonyms"]
+                # a match against a synonym identifier
+                # yields whatever the weight of the synonym was
+                # set to
                 for synonym in synonyms:
                     synid = synonym["identifier"] if synonym["identifier"] else ""
                     if synid == searchterm:
                         matchlist[synonym["synonymtype"]] = synonym["weight"]
-
-            print(matchlist)
-            if matchlist:
-                score = 1.0
+            if bool(matchlist):
+                return matchlist
             else:
-                score = 0
-            return score
+                return None
         else:
             return None
+
+    @hybrid_method
+    def score_result(self, searchterm=None):
+        matches = self.get_matches(searchterm)
+        max_score = 0
+        if matches:
+            max_key = max(matches, key=matches.get)
+            max_score = matches[max_key]
+        return max_score
 
 
 ix_identifiers = db.Index(
