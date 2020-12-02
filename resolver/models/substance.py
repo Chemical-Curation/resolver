@@ -34,7 +34,7 @@ class Substance(db.Model):
         if bool(searchterm):
             # search the identifiers for the term and score them
             matchlist = {}
-            for id_name in ["casrn", "preferred_name", "display_name","compound_id"]:
+            for id_name in ["casrn", "preferred_name", "display_name", "compound_id"]:
                 # an exact match against a top-level identifier
                 # yields a 1.0 score
                 if self.identifiers[id_name] == searchterm:
