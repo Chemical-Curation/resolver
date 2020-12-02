@@ -23,12 +23,6 @@ class SubstanceProvider(BaseProvider):
     Fake color names are as good as any other dummy string for substances
     """
 
-    def substancename(self):
-        return fake.color_name()
-
-    def synonymidentifier(self):
-        return fake.color_name()
-
     def synonymtype(self):
         return fake.random_elements(
             elements=("Generic Name", "Alternate CAS-RN", "Collapsed CAS-RN", "EINECS"),
@@ -40,7 +34,7 @@ class SubstanceProvider(BaseProvider):
 
     def substanceidentifierjson(self):
         identifiers = {}
-        identifiers["preferred_name"] = fake.color_name()
+        identifiers["preferred_name"] = fake.sentence(nb_words=3)
         identifiers["display_name"] = identifiers["preferred_name"]
         identifiers["casrn"] = fake.numerify(text="####-##-#")
         identifiers["inchikey"] = fake.lexify(text="????????????-??????????-?")

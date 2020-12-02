@@ -374,7 +374,7 @@ def test_substance_index_delete(client, db, substance_factory):
 
 def test_resolve_many_substances(client, db, substance_factory):
     # add a lot of substances
-    substances = substance_factory.create_batch(100)
+    substances = substance_factory.create_batch(1000)
     db.session.add_all(substances)
     db.session.commit()
 
