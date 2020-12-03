@@ -38,6 +38,8 @@ class SearchDataLayer(SqlalchemyDataLayer):
 
         collection = self.paginate_collection(collection, qs.pagination)
 
+        collection = self.after_get_collection(collection, qs, view_kwargs)
+
         return object_count, collection
 
     def paginate_collection(self, collection, paginate_info):
