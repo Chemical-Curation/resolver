@@ -2,6 +2,7 @@ from flask import request
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
 
+from resolver.api.data_layers import SearchDataLayer
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
 from resolver.models import Substance
 from resolver.extensions import db
@@ -266,7 +267,6 @@ class SubstanceSearchResultList(ResourceList):
     """
 
     def query(self, view_kwargs):
-        print(view_kwargs)
         query_ = self.session.query(Substance)
         if request.args.get("identifier") is not None:
             search_term = request.args.get("identifier")
@@ -306,27 +306,14 @@ class SubstanceSearchResultList(ResourceList):
             )
         return query_
 
-    def after_get_collection(self, collection, qs, view_kwargs):
-        """
-        Sorts the returned records by the value returned by Substance.score_result
-        It is not possible to apply the score_result hybrid method at the class level,
-        so we cannot just append `.order_by(Substance.score_result(search_term).desc())`
-        to the query. The score_result method only works at the row/instance level
-        """
-        if request.args.get("identifier") is not None:
-            search_term = request.args.get("identifier")
-            collection.sort(key=lambda x: x.score_result(search_term), reverse=True)
-
-        return collection
-
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
     # get_schema_kwargs = {"identifier": ("identifier",)}
     data_layer = {
+        "class": SearchDataLayer,
         "session": db.session,
         "model": Substance,
         "methods": {
             "query": query,
-            "after_get_collection": after_get_collection,
         },
     }

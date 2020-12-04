@@ -464,3 +464,31 @@ def test_resolve_many_substances(client, db, substance_factory):
         score_current = d["attributes"]["score"]
         assert score_current <= score_previous
         score_previous = score_current
+
+
+def test_resolve_searches_all_rows(client, db, substance_factory):
+    preferred_name = "Substance"
+
+    # Make 100 substances with near preferred name matches
+    for i in range(100):
+        substance = substance_factory()
+        substance.identifiers["preferred_name"] = f"{preferred_name} {i}"
+        db.session.add(substance)
+        db.session.commit()
+
+    # Add substance with preferred name exact match.
+    exact_substance = substance_factory()
+    exact_substance.identifiers["preferred_name"] = preferred_name
+    db.session.add(exact_substance)
+    db.session.commit()
+
+    search_url = url_for("resolved_substance_list", identifier=preferred_name)
+    rep = client.get(search_url)
+
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 101}  # 100 close matches + 1 exact match
+
+    first_result = results["data"][0]
+    assert first_result["attributes"]["score"] == 1  # First result is a perfect score
+    assert first_result["id"] == exact_substance.id  # First result is the correct sid
