@@ -1,0 +1,309 @@
+{
+	"info": {
+		"_postman_id": "cb6a4105-3a38-4a92-8b5d-b686e714440a",
+		"name": "Resolver",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "issue_248",
+			"item": [
+				{
+					"name": "substance synonym identifier",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseURL}}/resolver?identifier=Chem-5ical",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"resolver"
+							],
+							"query": [
+								{
+									"key": "identifier",
+									"value": "Chem-5ical"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "I want to be able to able to find a substance using a name or casrn that exists in the synonyms rather than the substance model",
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "GET Substances",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/substances",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"substances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search for a preferred name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/resolver?identifier=ample",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"resolver"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "ample"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search for a display name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/resolver?identifier=roxi",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"resolver"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "roxi"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search for a CASRN",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/resolver?identifier=7722-84-1",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"resolver"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "7722-84-1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Substances, Moperone DTXSID302000003",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.api+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"substance\",\n        \"attributes\": {\n            \"id\": \"DTXSID302000003\",\n            \"identifiers\": {\n                \"preferred_name\": \"Moperone\",\n                \"display_name\": \"Moperone\",\n                \"casrn\": \"1050-79-9\",\n                \"inchikey\": \"AGAHNABIDCTLHW-UHFFFAOYSA-N\",\n                \"casalts\": [\n                    {\n                        \"casalt\": \"0001050799\",\n                        \"weight\": 0.5\n                    },\n                    {\n                        \"casalt\": \"1050799\",\n                        \"weight\": 0.5\n                    }\n                ],\n                \"synonyms\": [\n                    {\n                        \"synonym\": \"Meperon\",\n                        \"weight\": 0.75\n                    },\n                    {\n                        \"synonym\": \"Methylperidol\",\n                        \"weight\": 0.5\n                    }\n                ]\n            }\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}substances",
+					"host": [
+						"{{BaseURL}}substances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Substances, Ethanol DTXSID9020584",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"substance\",\n        \"attributes\": {\n            \"id\": \"DTXSID9020584\",\n            \"identifiers\": {\n                \"preferred_name\": \"Ethanol\",\n                \"display_name\": \"Ethanol\",\n                \"casrn\": \"64-17-5\",\n                \"inchikey\": \"LFQSCWFLJHTTHZ-UHFFFAOYSA-N\",\n                \"casalts\": [\n                    {\n                        \"casalt\": \"64175\",\n                        \"weight\": 0.5\n                    },\n                    {\n                        \"casalt\": \"00064175\",\n                        \"weight\": 0.5\n                    }\n                ],\n                \"synonyms\": [\n                    {\n                        \"synonym\": \"Alcohol, Ethyl\",\n                        \"weight\": 0.75\n                    },\n                    {\n                        \"synonym\": \"Alcohol\",\n                        \"weight\": 0.5\n                    }\n                ]\n            }\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}substances",
+					"host": [
+						"{{BaseURL}}substances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Substances, Hydrogen Peroxide DTXSID302000005",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.api+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"substance\",\n        \"attributes\": {\n            \"id\": \"DTXSID302000005\",\n            \"identifiers\": {\n                \"preferred_name\": \"Hydrogen peroxide\",\n                \"display_name\": \"Hydrogen peroxide\",\n                \"casrn\": \"7722-84-1\",\n                \"inchikey\": \"MHAJPDPJQMAIIY-UHFFFAOYSA-N\",\n                \"casalts\": [\n                    {\n                        \"casalt\": \"0007722841\",\n                        \"weight\": 0.5\n                    },\n                    {\n                        \"casalt\": \"7722841\",\n                        \"weight\": 0.5\n                    }\n                ],\n                \"synonyms\": [\n                    {\n                        \"synonym\": \"Hydrogen peroxide [USP]\",\n                        \"weight\": 0.75\n                    },\n                    {\n                        \"synonym\": \"Wasserstoffperoxid\",\n                        \"weight\": 0.5\n                    }\n                ]\n            }\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}substances",
+					"host": [
+						"{{BaseURL}}substances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE DTXSID302000003",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}substances/DTXSID302000003",
+					"host": [
+						"{{BaseURL}}substances"
+					],
+					"path": [
+						"DTXSID302000003"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Ethanol, DTXSID9020584",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}substances/DTXSID9020584",
+					"host": [
+						"{{BaseURL}}substances"
+					],
+					"path": [
+						"DTXSID9020584"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Hydrogen peroxide DTXSID302000005",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}substances/DTXSID302000005",
+					"host": [
+						"{{BaseURL}}substances"
+					],
+					"path": [
+						"DTXSID302000005"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "bae9fd8a-df58-466c-8eca-e8f6e847af8b",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f3a8a97c-cef9-4bb6-b731-e6d551d046ff",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "b28b9cb9-42e0-42c3-8ba5-64af16467b37",
+			"key": "BaseURL",
+			"value": "http://localhost:5000/api/v1/",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
