@@ -5,7 +5,6 @@ from faker.providers import BaseProvider
 from resolver.models import User, Substance
 
 fake = Faker()
-Faker.seed(0)
 
 
 class UserFactory(factory.Factory):

@@ -37,8 +37,9 @@ class Substance(db.Model):
             for id_name in ["casrn", "preferred_name", "display_name", "compound_id"]:
                 # an exact match against a top-level identifier
                 # yields a 1.0 score
-                if self.identifiers[id_name] == searchterm:
-                    matchlist[id_name] = 1
+                if self.identifiers[id_name]:
+                    if self.identifiers[id_name] == searchterm:
+                        matchlist[id_name] = 1
             if self.identifiers["synonyms"]:
                 synonyms = self.identifiers["synonyms"]
                 # a match against a synonym identifier
@@ -57,6 +58,11 @@ class Substance(db.Model):
 
     @hybrid_method
     def score_result(self, searchterm=None):
+        """
+        Technical debt here: the identifiers in the indexed document are hard-coded
+        into the scoring loop
+        https://github.com/Chemical-Curation/resolver/pull/16#discussion_r536216962
+        """
         matches = self.get_matches(searchterm)
         max_score = 0
         if matches:

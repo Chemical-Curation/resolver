@@ -284,13 +284,7 @@ class SubstanceSearchResultList(ResourceList):
                 .subquery()
             )
 
-            query_ = self.session.query(
-                Substance,
-                # try stashing the search term in the query at the row level for the benefit
-                # of the Schema deserializer
-                # literal_column(f"'{search_term}'")
-                # .label("search_term")
-            ).filter(
+            query_ = self.session.query(Substance,).filter(
                 or_(
                     Substance.identifiers["preferred_name"].astext.ilike(
                         f"%{search_term}%"

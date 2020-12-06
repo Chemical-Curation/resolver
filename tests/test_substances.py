@@ -387,7 +387,6 @@ def test_resolve_many_substances(client, db, substance_factory):
     substance_later = substances[50]
 
     id_first = substance_first.id
-    id_later = substance_later.id
 
     # the index properties can be used here to fetch the preferred_name
     # without using the identifiers["preferred_name"] key
@@ -397,13 +396,6 @@ def test_resolve_many_substances(client, db, substance_factory):
     synonym_1_identifier_later = substance_later.identifiers["synonyms"][0][
         "identifier"
     ]
-    synonym_1_weight_later = substance_later.identifiers["synonyms"][0]["weight"]
-    synonym_1_type_later = substance_later.identifiers["synonyms"][0]["synonymtype"]
-
-    synonym_3_identifier_later = substance_later.identifiers["synonyms"][2][
-        "identifier"
-    ]
-    synonym_3_weight_later = substance_later.identifiers["synonyms"][2]["weight"]
 
     # make sure the factory generated distinct values
     assert (
