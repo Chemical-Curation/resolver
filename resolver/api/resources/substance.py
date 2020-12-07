@@ -2,10 +2,11 @@ from flask import request
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
 
+from resolver.api.data_layers import SearchDataLayer
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
 from resolver.models import Substance
 from resolver.extensions import db
-from sqlalchemy.sql.expression import or_
+from sqlalchemy.sql.expression import or_  # , literal_column
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList
 
@@ -283,7 +284,7 @@ class SubstanceSearchResultList(ResourceList):
                 .subquery()
             )
 
-            query_ = self.session.query(Substance).filter(
+            query_ = self.session.query(Substance,).filter(
                 or_(
                     Substance.identifiers["preferred_name"].astext.ilike(
                         f"%{search_term}%"
@@ -299,23 +300,14 @@ class SubstanceSearchResultList(ResourceList):
             )
         return query_
 
-    def after_get_collection(self, collection, qs, view_kwargs):
-        """
-        TODO: Scoring the members of the collection could happen here
-        See https://github.com/Chemical-Curation/chemcurator_django/issues/144
-        This method could also populate the `matches` field in the serialized
-        SubstanceSearchResultSchema
-        """
-        pass
-
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
     # get_schema_kwargs = {"identifier": ("identifier",)}
     data_layer = {
+        "class": SearchDataLayer,
         "session": db.session,
         "model": Substance,
         "methods": {
             "query": query,
-            # "after_get_collection": after_get_collection,
         },
     }

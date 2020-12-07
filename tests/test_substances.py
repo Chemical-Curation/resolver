@@ -1,4 +1,5 @@
 import pytest
+import copy
 from flask import url_for
 
 from resolver.api.schemas import SubstanceSchema
@@ -179,6 +180,7 @@ def test_resolve_substance(client, db, substance):
         "display_name": "Kraft Miracle Whip Original Dressing",
         "casrn": "1050-79-9",
         "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
+        "compound_id": "DTXCID302000093",
         "synonyms": [
             {"identifier": "Meperon", "weight": 0.75, "synonymtype": "Generic Name"},
             {
@@ -246,8 +248,11 @@ def test_resolve_substance(client, db, substance):
     assert results["data"] == []
 
     # test preferred name match
-    preferred_name = "Miracle Whip"
-    search_url = url_for("resolved_substance_list", identifier=preferred_name)
+    # (encode spaces in string first?)
+    search_url = url_for(
+        "resolved_substance_list",
+        identifier="Miracle Whip",
+    )
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
@@ -365,3 +370,117 @@ def test_substance_index_delete(client, db, substance_factory):
     assert resp.status_code == 200
     assert "Substance Index successfully cleared" in results["meta"]["message"]
     assert Substance.query.count() == 0
+
+
+def test_resolve_many_substances(client, db, substance_factory):
+    # add a lot of substances
+    substances = substance_factory.create_batch(1000)
+    db.session.add_all(substances)
+    db.session.commit()
+
+    # query the database and
+    # pick some attributes to search for:
+
+    substances = Substance.query.all()
+
+    substance_first = substances[0]
+    substance_later = substances[50]
+
+    id_first = substance_first.id
+
+    # the index properties can be used here to fetch the preferred_name
+    # without using the identifiers["preferred_name"] key
+    name_first = substance_first.preferred_name
+    name_later = substance_later.preferred_name
+
+    synonym_1_identifier_later = substance_later.identifiers["synonyms"][0][
+        "identifier"
+    ]
+
+    # make sure the factory generated distinct values
+    assert (
+        substance_later.identifiers["preferred_name"]
+        != substance_first.identifiers["preferred_name"]
+    )
+
+    # Searching by ID should return one result
+    search_url = url_for("resolved_substance_list", identifier=id_first)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+
+    # Searching by preferred_name should return one result
+    search_url = url_for("resolved_substance_list", identifier=name_first)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+
+    # Searching by synonym should return one result when the Alternate CAS-RN
+    # synonyms are all unique
+    search_url = url_for(
+        "resolved_substance_list", identifier=synonym_1_identifier_later
+    )
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+
+    # The Generic Name synonyms (index [2]) are not necessarily as unique,
+    # so create a condition where the search term is known to be a synonym and
+    # a preferred_name, and confirm that multiple records are returned
+    substance_first.identifiers = copy.deepcopy(substance_first.identifiers)
+    substance_first.identifiers["synonyms"][2]["identifier"] = name_later
+    db.session.add(substance_first)
+    db.session.commit()
+    assert substance_first.identifiers["synonyms"][2]["identifier"] == name_later
+
+    search_url = url_for("resolved_substance_list", identifier=name_later)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"]["count"] > 1
+
+    # A later substance's preferred_name has been assigned
+    # as a synonym to the first substance, so the first result
+    # should be the higher-scoring substance, which would normally
+    # not appear sorted at the beginning
+    assert results["data"][0]["attributes"]["score"] == 1
+    assert results["data"][1]["attributes"]["score"] < 1
+    # the "matches" dict should report what synonym type produced the match
+    assert "Generic Name" in results["data"][1]["attributes"]["matches"].keys()
+    # However many results there are, scores should descend monotonically
+    score_previous = 1.0
+    for d in results["data"]:
+        score_current = d["attributes"]["score"]
+        assert score_current <= score_previous
+        score_previous = score_current
+
+
+def test_resolve_searches_all_rows(client, db, substance_factory):
+    preferred_name = "Substance"
+
+    # Make 100 substances with near preferred name matches
+    for i in range(100):
+        substance = substance_factory()
+        substance.identifiers["preferred_name"] = f"{preferred_name} {i}"
+        db.session.add(substance)
+        db.session.commit()
+
+    # Add substance with preferred name exact match.
+    exact_substance = substance_factory()
+    exact_substance.identifiers["preferred_name"] = preferred_name
+    db.session.add(exact_substance)
+    db.session.commit()
+
+    search_url = url_for("resolved_substance_list", identifier=preferred_name)
+    rep = client.get(search_url)
+
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 101}  # 100 close matches + 1 exact match
+
+    first_result = results["data"][0]
+    assert first_result["attributes"]["score"] == 1  # First result is a perfect score
+    assert first_result["id"] == exact_substance.id  # First result is the correct sid
