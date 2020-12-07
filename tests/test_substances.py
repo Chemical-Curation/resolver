@@ -372,7 +372,6 @@ def test_substance_index_delete(client, db, substance_factory):
     assert Substance.query.count() == 0
 
 
-
 def test_resolve_many_substances(client, db, substance_factory):
     # add a lot of substances
     substances = substance_factory.create_batch(1000)
