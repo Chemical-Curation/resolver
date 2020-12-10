@@ -2,7 +2,7 @@ from flask import Flask
 
 from resolver import auth
 from resolver.api import views as api_views
-from resolver.extensions import db, jwt, migrate, apispec, init_db
+from resolver.extensions import db, jwt, migrate, apispec, init_db, ma
 
 
 def create_app(testing=False, cli=False):
@@ -25,6 +25,7 @@ def configure_extensions(app, cli):
     """configure flask extensions"""
     db.init_app(app)
     jwt.init_app(app)
+    ma.init_app(app)
 
     if cli is True:
         migrate.init_app(app, db)
