@@ -4,6 +4,7 @@ version: "3"
 services:
   db:
     image: postgres:12-alpine
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
@@ -26,6 +27,7 @@ services:
   web:
     image: resolver
     build: .
+    restart: unless-stopped
     command: gunicorn -b 0.0.0.0:5000 resolver.wsgi:app
     env_file:
       - ./.flaskenv
