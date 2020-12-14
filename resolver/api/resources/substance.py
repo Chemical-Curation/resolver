@@ -280,20 +280,20 @@ class SubstanceSearchResultList(ResourceList):
                     Substance,
                     func.jsonb_array_elements(Substance.identifiers["synonyms"]),
                 )
-                .filter(val["identifier"].astext.ilike(f"%{search_term}%"))
+                .filter(val["identifier"].astext.ilike(f"{search_term}"))
                 .subquery()
             )
 
             query_ = self.session.query(Substance,).filter(
                 or_(
                     Substance.identifiers["preferred_name"].astext.ilike(
-                        f"%{search_term}%"
+                        f"{search_term}"
                     ),
                     Substance.identifiers["compound_id"].astext.ilike(search_term),
                     Substance.id.ilike(search_term),
-                    Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
+                    Substance.identifiers["casrn"].astext.ilike(f"{search_term}"),
                     Substance.identifiers["display_name"].astext.ilike(
-                        f"%{search_term}%"
+                        f"{search_term}"
                     ),
                     Substance.id.in_(synonym_subquery),
                 )
