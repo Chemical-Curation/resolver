@@ -305,29 +305,29 @@ def test_resolve_substance(client, db, substance):
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
 
-    # test name containment
+    # test name containment (Partial Matching Removed in ticket #21)
     partial_name = "Miracle"
     search_url = url_for("resolved_substance_list", identifier=partial_name)
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
-    assert results["meta"] == {"count": 1}
+    assert results["meta"] == {"count": 0}
 
     # test case insensitivity
-    partial_name = "miracle"
+    partial_name = "miracle whip"
     search_url = url_for("resolved_substance_list", identifier=partial_name)
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
 
-    # test multiple matches
+    # test multiple matches (Partial Matching Removed in ticket #21)
     partial_name = "Original Dressing"
     search_url = url_for("resolved_substance_list", identifier=partial_name)
     rep = client.get(search_url)
     assert rep.status_code == 200
     results = rep.get_json()
-    assert results["meta"] == {"count": 2}
+    assert results["meta"] == {"count": 0}
 
 
 # Tests both create and update functionality using param create_test.
@@ -479,7 +479,8 @@ def test_resolve_searches_all_rows(client, db, substance_factory):
 
     assert rep.status_code == 200
     results = rep.get_json()
-    assert results["meta"] == {"count": 101}  # 100 close matches + 1 exact match
+    # 100 close matches + 1 exact match (Ticket #21 containment no longer matches. Count from 101 to 1)
+    assert results["meta"] == {"count": 1}
 
     first_result = results["data"][0]
     assert first_result["attributes"]["score"] == 1  # First result is a perfect score
