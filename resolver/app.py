@@ -9,9 +9,6 @@ def create_app(testing=False, cli=False):
     """Application factory, used to create application"""
     app = Flask("resolver")
     app.config.from_object("resolver.config")
-    # this is the only place I was able to reliably set this variable
-    # and avoid getting nagged about it
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     if testing is True:
         app.config["TESTING"] = True
