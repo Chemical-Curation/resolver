@@ -1,3 +1,4 @@
+import os
 import json
 import pytest
 from dotenv import load_dotenv
@@ -15,7 +16,8 @@ register(SubstanceFactory)
 
 @pytest.fixture(scope="session")
 def app():
-    load_dotenv(".testenv")
+    load_dotenv(".env")
+    os.environ["DATABASE_URI"] += "_test"
     app = create_app(testing=True)
     return app
 
