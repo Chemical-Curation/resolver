@@ -289,6 +289,7 @@ class SubstanceSearchResultList(ResourceList):
                     Substance.identifiers["preferred_name"].astext.ilike(
                         f"{search_term}"
                     ),
+                    Substance.identifiers["inchikey"].astext.ilike(f"{search_term}"),
                     Substance.identifiers["compound_id"].astext.ilike(search_term),
                     Substance.id.ilike(search_term),
                     Substance.identifiers["casrn"].astext.ilike(f"{search_term}"),
