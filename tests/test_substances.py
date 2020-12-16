@@ -305,6 +305,15 @@ def test_resolve_substance(client, db, substance):
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
 
+    # test Inchikey match
+    inchikey = "UUTBLVFYDQGDNV-UHFFFAOYSA-N"
+    search_url = url_for("resolved_substance_list", identifier=inchikey)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+    assert results["data"][0]["attributes"]["score"] == 1
+
     # test name containment (Partial Matching Removed in ticket #21)
     partial_name = "Miracle"
     search_url = url_for("resolved_substance_list", identifier=partial_name)
