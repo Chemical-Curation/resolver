@@ -38,7 +38,7 @@ class Substance(db.Model):
                 # an exact match against a top-level identifier
                 # yields a 1.0 score
                 if self.identifiers[id_name]:
-                    if self.identifiers[id_name] == searchterm:
+                    if self.identifiers[id_name].casefold() == searchterm.casefold():
                         matchlist[id_name] = 1
             if self.identifiers["synonyms"]:
                 synonyms = self.identifiers["synonyms"]
@@ -47,7 +47,7 @@ class Substance(db.Model):
                 # set to
                 for synonym in synonyms:
                     synid = synonym["identifier"] if synonym["identifier"] else ""
-                    if synid == searchterm:
+                    if synid.casefold() == searchterm.casefold():
                         matchlist[synonym["synonymtype"]] = synonym["weight"]
             if bool(matchlist):
                 return matchlist
