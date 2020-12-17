@@ -320,6 +320,7 @@ def test_resolve_substance(client, db, substance):
     assert rep.status_code == 200
     results = rep.get_json()
     assert results["meta"] == {"count": 1}
+    assert results["data"][0]["attributes"]["score"] == 1  # exact match despite case
 
     # test multiple matches (Partial Matching Removed in ticket #21)
     partial_name = "Original Dressing"
