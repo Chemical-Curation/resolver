@@ -214,7 +214,7 @@ def test_resolve_substance(client, db, substance):
         "preferred_name": "Butyric acid, 2-(5-nitro-alpha-iminofurfuryl)hydrazide",
         "display_name": "Butyric acid Original Dressing",
         "casrn": "3757-31-1",
-        "inchikey": "UUTBLVFYDQGDNV-UHFFFAOYSA-N",
+        "inchikey": "AECPIECQUWDXGM-UXBLZVDNSA-N",  # this inchikey is verified vs SMILES and inchi searches.
         "compound_id": "DTXCID302000003",
         "synonyms": [
             {
@@ -306,7 +306,25 @@ def test_resolve_substance(client, db, substance):
     assert results["meta"] == {"count": 1}
 
     # test Inchikey match
-    inchikey = "UUTBLVFYDQGDNV-UHFFFAOYSA-N"
+    inchikey = "AECPIECQUWDXGM-UXBLZVDNSA-N"
+    search_url = url_for("resolved_substance_list", identifier=inchikey)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+    assert results["data"][0]["attributes"]["score"] == 1
+
+    # test SMILES match
+    smiles = "CCCC(=O)N/N=C(/C1=CC=C(O1)[N+](=O)[O-])"
+    search_url = url_for("resolved_substance_list", identifier=smiles)
+    rep = client.get(search_url)
+    assert rep.status_code == 200
+    results = rep.get_json()
+    assert results["meta"] == {"count": 1}
+    assert results["data"][0]["attributes"]["score"] == 1
+
+    # test Inchi match
+    inchikey = "InChI=1S/C9H11N3O4/c1-2-3-8(13)11-10-6-7-4-5-9(16-7)12(14)15/h4-6H,2-3H2,1H3,(H,11,13)/b10-6+"
     search_url = url_for("resolved_substance_list", identifier=inchikey)
     rep = client.get(search_url)
     assert rep.status_code == 200
