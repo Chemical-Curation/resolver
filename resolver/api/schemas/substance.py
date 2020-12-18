@@ -1,5 +1,5 @@
 from resolver.models import Substance
-from resolver.extensions import db
+from resolver.extensions import db, getInchikey
 from marshmallow_jsonapi.schema import Schema
 from marshmallow_jsonapi import fields
 from flask import request
@@ -23,10 +23,10 @@ class SubstanceSearchResultSchema(Schema):
     identifiers = fields.Raw(required=True)
     # the matches will be the fields in which the identifier was found
     matches = fields.Function(
-        lambda obj: obj.get_matches(request.args.get("identifier"))
+        lambda obj: obj.get_matches(getInchikey(request.args.get("identifier")))
     )
     score = fields.Function(
-        lambda obj: obj.score_result(request.args.get("identifier"))
+        lambda obj: obj.score_result(getInchikey(request.args.get("identifier")))
     )
 
     class Meta:

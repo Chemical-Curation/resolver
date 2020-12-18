@@ -1,6 +1,8 @@
 from flask import current_app, request
 from flask_rest_jsonapi.data_layers.alchemy import SqlalchemyDataLayer
 
+from resolver.extensions import getInchikey
+
 
 class SearchDataLayer(SqlalchemyDataLayer):
     """Sqlalchemy data layer specifically to use python sorting."""
@@ -72,7 +74,8 @@ class SearchDataLayer(SqlalchemyDataLayer):
         to the query. The score_result method only works at the row/instance level
         """
         if request.args.get("identifier") is not None:
-            search_term = request.args.get("identifier")
+            search_term = getInchikey(request.args.get("identifier"))
+
             collection.sort(key=lambda x: x.score_result(search_term), reverse=True)
 
         return collection
