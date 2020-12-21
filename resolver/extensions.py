@@ -4,7 +4,7 @@ All extensions here are used as singletons and
 initialized in application factory
 """
 from flask_sqlalchemy import SQLAlchemy
-from indigo import Indigo
+from indigo import Indigo, IndigoException
 from indigo.inchi import IndigoInchi
 from passlib.context import CryptContext
 from flask_jwt_extended import JWTManager
@@ -37,7 +37,7 @@ def getInchikey(mol: str) -> str:
         loaded_molecule = indigo.loadMolecule(mol)
         inchi = indigo_inchi.getInchi(loaded_molecule)
         return indigo_inchi.getInchiKey(inchi)
-    except:
+    except IndigoException:
         return mol
 
 

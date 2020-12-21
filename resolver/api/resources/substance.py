@@ -1,5 +1,4 @@
 from flask import request
-from indigo import Indigo
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
 
