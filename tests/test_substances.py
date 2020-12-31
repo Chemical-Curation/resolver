@@ -496,17 +496,20 @@ def test_resolve_searches_all_rows(client, db, substance_factory):
     assert first_result["attributes"]["score"] == 1  # First result is a perfect score
     assert first_result["id"] == exact_substance.id  # First result is the correct sid
 
+
 def test_resolve_no_pagination(client, db, substance_factory):
     n = 100
+    identifier = "Substance"
 
     # Make n substances
     for i in range(n):
         substance = substance_factory()
+        substance.identifiers["preferred_name"] = f"{identifier}"
         db.session.add(substance)
         db.session.commit()
 
-    #search the 100
-    search_url = url_for("resolved_substance_list")
+    # search all substances
+    search_url = url_for("resolved_substance_list", identifier=identifier)
     resp = client.get(search_url)
     results = resp.get_json()
 
