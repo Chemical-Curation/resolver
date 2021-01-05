@@ -15,6 +15,7 @@ setup(
         "flask-jwt-extended",
         "flask-marshmallow",
         "gunicorn",
+        "epam.indigo",
         "marshmallow-sqlalchemy",
         "python-dotenv",
         "psycopg2-binary",
