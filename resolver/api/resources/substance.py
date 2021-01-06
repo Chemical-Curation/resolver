@@ -301,6 +301,11 @@ class SubstanceSearchResultList(ResourceList):
             )
         return query_
 
+    def after_get(self, result):
+        # Remove Pagination
+        result.pop("links", None)
+        return result
+
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
     # get_schema_kwargs = {"identifier": ("identifier",)}

@@ -38,7 +38,7 @@ class SearchDataLayer(SqlalchemyDataLayer):
 
         collection = self.calculate_scores(collection, qs, view_kwargs)
 
-        collection = self.paginate_collection(collection, qs.pagination)
+        # collection = self.paginate_collection(collection, qs.pagination)
 
         collection = self.after_get_collection(collection, qs, view_kwargs)
 
