@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy import text
 from sqlalchemy.sql import func
+from sqlalchemy.ext.hybrid import hybrid_method
 
 
 class Substance(db.Model):
@@ -27,6 +28,53 @@ class Substance(db.Model):
 
     casrn = index_property("identifiers", "casrn", default=None)
     preferred_name = index_property("identifiers", "preferred_name", default=None)
+
+    @hybrid_method
+    def get_matches(self, searchterm=None):
+        if bool(searchterm):
+            # search the identifiers for the term and score them
+            matchlist = {}
+            for id_name in [
+                "casrn",
+                "preferred_name",
+                "display_name",
+                "compound_id",
+                "inchikey",
+            ]:
+                # an exact match against a top-level identifier
+                # yields a 1.0 score
+                if self.identifiers[id_name]:
+                    if self.identifiers[id_name].casefold() == searchterm.casefold():
+                        matchlist[id_name] = 1
+            if self.identifiers["synonyms"]:
+                synonyms = self.identifiers["synonyms"]
+                # a match against a synonym identifier
+                # yields whatever the weight of the synonym was
+                # set to
+                for synonym in synonyms:
+                    synid = synonym["identifier"] if synonym["identifier"] else ""
+                    if synid.casefold() == searchterm.casefold():
+                        matchlist[synonym["synonymtype"]] = synonym["weight"]
+            if bool(matchlist):
+                return matchlist
+            else:
+                return None
+        else:
+            return None
+
+    @hybrid_method
+    def score_result(self, searchterm=None):
+        """
+        Technical debt here: the identifiers in the indexed document are hard-coded
+        into the scoring loop
+        https://github.com/Chemical-Curation/resolver/pull/16#discussion_r536216962
+        """
+        matches = self.get_matches(searchterm)
+        max_score = 0
+        if matches:
+            max_key = max(matches, key=matches.get)
+            max_score = matches[max_key]
+        return max_score
 
 
 ix_identifiers = db.Index(

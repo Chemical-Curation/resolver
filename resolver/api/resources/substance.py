@@ -2,10 +2,11 @@ from flask import request
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
 
+from resolver.api.data_layers import SearchDataLayer
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
 from resolver.models import Substance
-from resolver.extensions import db
-from sqlalchemy.sql.expression import or_
+from resolver.extensions import db, getInchikey
+from sqlalchemy.sql.expression import or_  # , literal_column
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList
 
@@ -268,7 +269,7 @@ class SubstanceSearchResultList(ResourceList):
     def query(self, view_kwargs):
         query_ = self.session.query(Substance)
         if request.args.get("identifier") is not None:
-            search_term = request.args.get("identifier")
+            search_term = getInchikey(request.args.get("identifier"))
 
             # This allows reference to the aliased results from synonym select_from jsonb_array_elements
             val = db.column("value", type_=JSONB)
@@ -279,43 +280,40 @@ class SubstanceSearchResultList(ResourceList):
                     Substance,
                     func.jsonb_array_elements(Substance.identifiers["synonyms"]),
                 )
-                .filter(val["identifier"].astext.ilike(f"%{search_term}%"))
+                .filter(val["identifier"].astext.ilike(f"{search_term}"))
                 .subquery()
             )
 
-            query_ = self.session.query(Substance).filter(
+            query_ = self.session.query(Substance,).filter(
                 or_(
                     Substance.identifiers["preferred_name"].astext.ilike(
-                        f"%{search_term}%"
+                        f"{search_term}"
                     ),
+                    Substance.identifiers["inchikey"].astext.ilike(f"{search_term}"),
                     Substance.identifiers["compound_id"].astext.ilike(search_term),
                     Substance.id.ilike(search_term),
-                    Substance.identifiers["casrn"].astext.ilike(f"%{search_term}%"),
+                    Substance.identifiers["casrn"].astext.ilike(f"{search_term}"),
                     Substance.identifiers["display_name"].astext.ilike(
-                        f"%{search_term}%"
+                        f"{search_term}"
                     ),
                     Substance.id.in_(synonym_subquery),
                 )
             )
         return query_
 
-    def after_get_collection(self, collection, qs, view_kwargs):
-        """
-        TODO: Scoring the members of the collection could happen here
-        See https://github.com/Chemical-Curation/chemcurator_django/issues/144
-        This method could also populate the `matches` field in the serialized
-        SubstanceSearchResultSchema
-        """
-        pass
+    def after_get(self, result):
+        # Remove Pagination
+        result.pop("links", None)
+        return result
 
     methods = ["GET"]
     schema = SubstanceSearchResultSchema
     # get_schema_kwargs = {"identifier": ("identifier",)}
     data_layer = {
+        "class": SearchDataLayer,
         "session": db.session,
         "model": Substance,
         "methods": {
             "query": query,
-            # "after_get_collection": after_get_collection,
         },
     }
