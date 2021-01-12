@@ -1,5 +1,10 @@
 import factory
+from faker import Faker
+from faker.providers import BaseProvider
+
 from resolver.models import User, Substance
+
+fake = Faker()
 
 
 class UserFactory(factory.Factory):
@@ -12,15 +17,54 @@ class UserFactory(factory.Factory):
         model = User
 
 
-class SubstanceFactory(factory.Factory):
+class SubstanceProvider(BaseProvider):
+    """
+    Fake color names are as good as any other dummy string for substances
+    """
 
-    id = factory.Sequence(lambda n: f"DTXCID{n:09}")
-    identifiers = (
-        { "preferred_name":"Moperone","display_name":"Moperone","casrn":"1050-79-9",
-        "inchikey": "AGAHNABIDCTLHW-UHFFFAOYSA-N",
-        "casalts":[{"casalt":"0001050799","weight":0.5},{"casalt":"1050799","weight":0.5}],
-        "synonyms": [{"identifier": "Meperon","weight": 0.75},{"identifier": "Methylperidol","weight": 0.5}]}
-    )
+    def synonymtype(self):
+        return fake.random_elements(
+            elements=("Generic Name", "Alternate CAS-RN", "Collapsed CAS-RN", "EINECS"),
+            length=1,
+        )[0]
+
+    def synonymweight(self):
+        return fake.randomize_nb_elements(number=40) / 100
+
+    def substanceidentifierjson(self):
+        identifiers = {}
+        identifiers["preferred_name"] = fake.sentence(nb_words=3)
+        identifiers["display_name"] = identifiers["preferred_name"]
+        identifiers["casrn"] = fake.numerify(text="####-##-#")
+        identifiers["inchikey"] = fake.lexify(text="????????????-??????????-?")
+        identifiers["compound_id"] = fake.numerify(text="DTXCID#########")
+        identifiers["synonyms"] = [
+            {
+                "identifier": fake.numerify(text="00######"),
+                "weight": fake.randomize_nb_elements(number=50) / 100,
+                "synonymtype": "Alternate CAS-RN",
+            },
+            {
+                "identifier": fake.numerify(text="00######"),
+                "weight": fake.randomize_nb_elements(number=50) / 100,
+                "synonymtype": "Alternate CAS-RN",
+            },
+            {
+                "identifier": fake.color_name(),
+                "weight": fake.randomize_nb_elements(number=50) / 100,
+                "synonymtype": "Generic Name",
+            },
+        ]
+        return identifiers
+
+
+fake.add_provider(SubstanceProvider)
+
+
+class SubstanceFactory(factory.Factory):
+    id = factory.Sequence(lambda n: f"DTXSID{n:09}")
+
+    identifiers = factory.LazyAttribute(lambda n: fake.substanceidentifierjson())
 
     class Meta:
         model = Substance
