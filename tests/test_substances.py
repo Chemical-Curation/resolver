@@ -533,3 +533,22 @@ def test_resolve_no_pagination(client, db, substance_factory):
 
     assert not results.get("links")
     assert len(results["data"]) == n
+
+
+def test_resolve_identifier_required_parameter(client, db, substance_factory):
+
+    # no identifier filter parameter
+    search_url = url_for("resolved_substance_list")
+    rep = client.get(search_url)
+
+    assert rep.status_code == 400
+    resp = rep.get_json()
+    assert resp["errors"][0]["detail"] == "'identifier' is a required parameter for this endpoint."
+
+    # empty string in identifier parameter
+    search_url = url_for("resolved_substance_list", identifier="")
+    rep = client.get(search_url)
+
+    assert rep.status_code == 400
+    resp = rep.get_json()
+    assert resp["errors"][0]["detail"] == "'identifier' is a required parameter for this endpoint."
