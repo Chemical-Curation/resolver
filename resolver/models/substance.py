@@ -1,3 +1,4 @@
+from resolver.commons.search_helpers import prep_casrn
 from resolver.extensions import db
 
 from sqlalchemy.dialects.postgresql import JSONB
@@ -55,6 +56,10 @@ class Substance(db.Model):
                     synid = synonym["identifier"] if synonym["identifier"] else ""
                     if synid.casefold() == searchterm.casefold():
                         matchlist[synonym["synonymtype"]] = synonym["weight"]
+            if matchlist.get("casrn") is None and self.identifiers.get(
+                "casrn"
+            ) == prep_casrn(searchterm):
+                matchlist["casrn"] = 0.25
             if bool(matchlist):
                 return matchlist
             else:
