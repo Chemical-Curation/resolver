@@ -3,6 +3,7 @@ import subprocess
 import click
 from flask.cli import FlaskGroup
 
+from flask import current_app
 from resolver.app import create_app
 from resolver.extensions import init_db
 
@@ -25,9 +26,9 @@ def initdb():
 @cli.command("lint")
 def lint():
     """lint all of the files in this repo with flake8 and black"""
-    if "resolver" in os.getcwd():
-        subprocess.run(["black", "."], cwd=os.getcwd())
-        subprocess.run(["flake8"], cwd=os.getcwd())
+    resolver_dir = os.path.dirname(current_app.root_path)
+    subprocess.run(["black", "."], cwd=resolver_dir)
+    subprocess.run(["flake8"], cwd=resolver_dir)
 
 
 @cli.command("init")
