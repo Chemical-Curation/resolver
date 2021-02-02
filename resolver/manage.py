@@ -1,3 +1,5 @@
+import os
+import subprocess
 import click
 from flask.cli import FlaskGroup
 
@@ -18,6 +20,14 @@ def cli():
 def initdb():
     init_db()
     print("Database Created")
+
+
+@cli.command("lint")
+def lint():
+    """lint all of the files in this repo with flake8 and black"""
+    if "resolver" in os.getcwd():
+        subprocess.run(["black", "."], cwd=os.getcwd())
+        subprocess.run(["flake8"], cwd=os.getcwd())
 
 
 @cli.command("init")

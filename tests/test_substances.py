@@ -543,7 +543,10 @@ def test_resolve_identifier_required_parameter(client, db, substance_factory):
 
     assert rep.status_code == 400
     resp = rep.get_json()
-    assert resp["errors"][0]["detail"] == "'identifier' is a required parameter for this endpoint."
+    assert (
+        resp["errors"][0]["detail"]
+        == "'identifier' is a required parameter for this endpoint."
+    )
 
     # empty string in identifier parameter
     search_url = url_for("resolved_substance_list", identifier="")
@@ -551,4 +554,7 @@ def test_resolve_identifier_required_parameter(client, db, substance_factory):
 
     assert rep.status_code == 400
     resp = rep.get_json()
-    assert resp["errors"][0]["detail"] == "'identifier' is a required parameter for this endpoint."
+    assert (
+        resp["errors"][0]["detail"]
+        == "'identifier' is a required parameter for this endpoint."
+    )
