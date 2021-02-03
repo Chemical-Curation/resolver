@@ -340,8 +340,8 @@ def test_resolve_substance(client, db, substance):
         assert rep.status_code == 200
         results = rep.get_json()
         assert results["meta"] == {"count": 1}
-        assert results["data"][0]["attributes"]["score"] == .25
-        assert results["data"][0]["attributes"]["matches"]["casrn"] == .25
+        assert results["data"][0]["attributes"]["score"] == 0.25
+        assert results["data"][0]["attributes"]["matches"]["casrn"] == 0.25
 
     # test name containment (Partial Matching Removed in ticket #21)
     partial_name = "Miracle"
