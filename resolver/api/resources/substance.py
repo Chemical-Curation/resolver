@@ -9,6 +9,7 @@ from resolver.extensions import db, getInchikey
 from sqlalchemy.sql.expression import or_  # , literal_column
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList
+from flask_rest_jsonapi.exceptions import BadRequest
 
 
 class SubstanceResource(ResourceDetail):
@@ -268,7 +269,9 @@ class SubstanceSearchResultList(ResourceList):
 
     def query(self, view_kwargs):
         query_ = self.session.query(Substance)
-        if request.args.get("identifier") is not None:
+        if not request.args.get("identifier"):
+            raise BadRequest("'identifier' is a required parameter for this endpoint.")
+        else:
             search_term = getInchikey(request.args.get("identifier"))
 
             # This allows reference to the aliased results from synonym select_from jsonb_array_elements
