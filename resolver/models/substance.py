@@ -59,7 +59,7 @@ class Substance(db.Model):
             if matchlist.get("casrn") is None and self.identifiers.get(
                 "casrn"
             ) == prep_casrn(searchterm):
-                matchlist["casrn"] = 0.25
+                matchlist["casrn"] = 0.75  # primary match of 1 - .25 penalty for mistype
             if bool(matchlist):
                 return matchlist
             else:
