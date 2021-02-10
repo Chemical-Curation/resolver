@@ -332,6 +332,17 @@ def test_resolve_substance(client, db, substance):
     assert results["meta"] == {"count": 1}
     assert results["data"][0]["attributes"]["score"] == 1
 
+    # test mis-formatted CASRN matches (1050799 and 0001050799 match as synonyms)
+    bad_casrns = ["001050799", "000001050-7-99"]
+    for bad_casrn in bad_casrns:
+        search_url = url_for("resolved_substance_list", identifier=bad_casrn)
+        rep = client.get(search_url)
+        assert rep.status_code == 200
+        results = rep.get_json()
+        assert results["meta"] == {"count": 1}
+        assert results["data"][0]["attributes"]["score"] == 0.75
+        assert results["data"][0]["attributes"]["matches"]["casrn"] == 0.75
+
     # test name containment (Partial Matching Removed in ticket #21)
     partial_name = "Miracle"
     search_url = url_for("resolved_substance_list", identifier=partial_name)

@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 
 from resolver.api.data_layers import SearchDataLayer
 from resolver.api.schemas import SubstanceSchema, SubstanceSearchResultSchema
+from resolver.commons.search_helpers import prep_casrn
 from resolver.models import Substance
 from resolver.extensions import db, getInchikey
 from sqlalchemy.sql.expression import or_  # , literal_column
@@ -295,7 +296,9 @@ class SubstanceSearchResultList(ResourceList):
                     Substance.identifiers["inchikey"].astext.ilike(f"{search_term}"),
                     Substance.identifiers["compound_id"].astext.ilike(search_term),
                     Substance.id.ilike(search_term),
-                    Substance.identifiers["casrn"].astext.ilike(f"{search_term}"),
+                    Substance.identifiers["casrn"].astext.ilike(
+                        prep_casrn(search_term)
+                    ),
                     Substance.identifiers["display_name"].astext.ilike(
                         f"{search_term}"
                     ),
