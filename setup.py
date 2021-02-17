@@ -12,7 +12,7 @@ setup(
         "flask-sqlalchemy",
         "flask-restful",
         "flask-migrate",
-        "flask-jwt-extended",
+        "flask-jwt-extended==3.24.1",
         "flask-marshmallow",
         "gunicorn",
         "epam.indigo",
