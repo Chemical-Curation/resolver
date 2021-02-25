@@ -35,39 +35,48 @@ class Substance(db.Model):
         if bool(searchterm):
             # search the identifiers for the term and score them
             matchlist = {}
-            for id_name in [
-                "casrn",
-                "preferred_name",
-                "display_name",
-                "compound_id",
-                "inchikey",
-            ]:
+            for key, value in self.identifiers.items():
                 # an exact match against a top-level identifier
                 # yields a 1.0 score
-                if self.identifiers[id_name]:
-                    if self.identifiers[id_name].casefold() == searchterm.casefold():
-                        matchlist[id_name] = 1
-            if self.identifiers["synonyms"]:
-                synonyms = self.identifiers["synonyms"]
-                # a match against a synonym identifier
-                # yields whatever the weight of the synonym was
-                # set to
-                for synonym in synonyms:
-                    synid = synonym["identifier"] if synonym["identifier"] else ""
-                    if synid.casefold() == searchterm.casefold():
-                        matchlist[synonym["synonymtype"]] = synonym["weight"]
-            if matchlist.get("casrn") is None and self.identifiers.get(
-                "casrn"
-            ) == prep_casrn(searchterm):
-                matchlist[
-                    "casrn"
-                ] = 0.75  # primary match of 1 - .25 penalty for mistype
+                if type(value) == str:
+                    # exact match
+                    if value.casefold() == searchterm.casefold():
+                        matchlist[key] = 1
+                    # corrected match
+                    else:
+                        score = self.search_corrections(value, searchterm, [prep_casrn])
+                        if score:
+                            matchlist[key] = score
+
+                # Matches against lists of dicts will compared by their "identifier"
+                # and be scored with their custom score "weight"
+                if type(value) == list:
+                    for entry in value:
+                        # fetch the identifier for the list entry.
+                        identifier = entry.get("identifier", None)
+                        if identifier.casefold() == searchterm.casefold():
+                            # TODO: one to many relationships are currently a list of objects
+                            #     that contain the keys:
+                            #         - "identifier" (key to match on)
+                            #         - "weight" (score) and
+                            #         - "synonymtype" (the reason for this match on the match list)
+                            #     It may make more sense to replace "synonymtype" with something
+                            #     more generic like "match_name" to avoid implementation specific
+                            #     terminology.
+                            matchlist[entry["synonymtype"]] = entry["weight"]
+
             if bool(matchlist):
                 return matchlist
             else:
                 return None
         else:
             return None
+
+    def search_corrections(self, value, searchterm, cleaners):
+        for cleaning_func in cleaners:
+            cleaned_string = cleaning_func(searchterm)
+            if value == cleaned_string:
+                return 0.75  # primary match of 1 - .25 penalty for mistype
 
     @hybrid_method
     def score_result(self, searchterm=None):
